@@ -69,16 +69,16 @@
       try {
         const response = await fetch(arenaData);
         const result = await response.json();
-        const items = result.contents;
+        const items = result.data;   // 여기 중요
         const page = document.getElementById("page");
         let list = [];
 
         items.forEach(block => {
-          const imageURL = block.image?.display?.url || block.image?.original?.url || block.image?.thumb?.url || block.image?.src;
+          const imageURL = block.image?.display?.url || block.image?.original?.url || block.image?.thumb?.url;
           if (!imageURL) return;
 
           let size = Math.random() * 150 + 80;
-          let x, y, ok;
+          let x, y, ok, tries = 0;
 
           do {
             ok = true;
@@ -95,6 +95,9 @@
                 break;
               }
             }
+
+            tries++;
+            if (tries > 200) return;
           } while (!ok);
 
           const bubble = document.createElement("div");
