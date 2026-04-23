@@ -59,20 +59,43 @@ body{
 
 <script>
 let page = document.getElementById("page");
+let list = [];
 
 for(let i=0;i<20;i++){
+
   let b = document.createElement("div");
   b.className = "b";
 
   let size = Math.random()*150 + 80;
+  let x, y, ok;
+
+  do{
+    ok = true;
+
+    x = Math.random()*(window.innerWidth - size);
+    y = Math.random()*(window.innerHeight - size);
+
+    for(let j=0;j<list.length;j++){
+      let dx = x - list[j].x;
+      let dy = y - list[j].y;
+      let dist = Math.sqrt(dx*dx + dy*dy);
+
+      if(dist < size/2 + list[j].size/2 + 10){
+        ok = false;
+        break;
+      }
+    }
+
+  }while(!ok);
 
   b.style.width = size + "px";
   b.style.height = size + "px";
-
-  b.style.left = Math.random()*80 + "%";
-  b.style.top = Math.random()*80 + "%";
+  b.style.left = x + "px";
+  b.style.top = y + "px";
 
   page.appendChild(b);
+
+  list.push({x:x, y:y, size:size});
 }
 </script>
 
