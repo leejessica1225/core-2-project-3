@@ -86,7 +86,6 @@
     const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=20";
 
     async function loadBubbles() {
-
       const res = await fetch(arenaData);
       const data = await res.json();
       const items = data.data;
@@ -95,7 +94,6 @@
       let placed = [];
 
       items.forEach(block => {
-
         let imageURL =
           block.image?.display?.url ||
           block.image?.original?.url ||
@@ -104,8 +102,15 @@
 
         if (!imageURL) return;
 
-        let w = Math.random() * 180 + 220;
-        let h = w * 0.75;
+        let sizes = [
+          { w: 200, h: 150 },
+          { w: 300, h: 220 },
+          { w: 420, h: 300 }
+        ];
+
+        let pick = sizes[Math.floor(Math.random() * 3)];
+        let w = pick.w;
+        let h = pick.h;
 
         let x, y, ok;
         let tries = 0;
@@ -159,7 +164,6 @@
         page.appendChild(bubble);
 
         placed.push({ x: x, y: y, w: w, h: h });
-
       });
     }
 
