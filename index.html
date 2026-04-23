@@ -96,7 +96,8 @@
         let imageURL =
           block.image?.display?.url ||
           block.image?.original?.url ||
-          block.image?.thumb?.url;
+          block.image?.thumb?.url ||
+          block.image?.src;
 
         if (!imageURL) return;
 
@@ -106,6 +107,7 @@
         let x;
         let y;
         let clear;
+        let tries = 0;
 
         do {
           clear = true;
@@ -126,6 +128,10 @@
               clear = false;
             }
           }
+
+          tries++;
+          if (tries > 100) return;
+
         } while (!clear);
 
         let bubble = document.createElement("div");
