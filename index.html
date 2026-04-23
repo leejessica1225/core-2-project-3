@@ -2,131 +2,149 @@
 <html>
 <head>
   <title>Parsons Survival Network</title>
+
   <style>
-    body{
-      margin:0;
-      background:#eee;
-      font-family:Arial;
+    body {
+      margin: 0;
+      background: #eee;
+      font-family: Arial;
     }
 
-    .page{
-      position:relative;
-      height:100vh;
-      overflow:hidden;
-      border:2px solid #000;
+    .page {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      border: 2px solid black;
     }
 
-    .title{
-      position:absolute;
-      top:30px;
-      left:30px;
-      font-size:26px;
-      line-height:1.2;
-      z-index:10;
+    .title {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      font-size: 26px;
+      line-height: 1.2;
+      z-index: 10;
     }
 
-    .title span{
-      border-bottom:4px solid #000;
+    .title span {
+      border-bottom: 4px solid black;
     }
 
-    .mode{
-      position:absolute;
-      top:40px;
-      right:100px;
-      font-size:16px;
-      z-index:10;
+    .mode {
+      position: absolute;
+      top: 40px;
+      right: 100px;
+      font-size: 16px;
+      z-index: 10;
     }
 
-    .b{
-      position:absolute;
-      border-radius:50%;
-      overflow:hidden;
-      background:#d3d3d3;
+    .bubble {
+      position: absolute;
+      background: #d3d3d3;
+      border-radius: 50%;
     }
 
-    .b img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
+    .photo {
+      position: absolute;
+      width: 70%;
+      height: 55%;
+      left: 15%;
+      top: 15%;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #aaa;
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .info {
+      position: absolute;
+      left: 60px;
+      bottom: 40px;
+      font-size: 20px;
+      transform: rotate(35deg);
     }
   </style>
 </head>
+
 <body>
   <div class="page" id="page">
     <div class="title">
       <span>PARSONS SURVIVAL</span><br>
       <span>NETWORK</span>
     </div>
+
     <div class="mode">offering</div>
   </div>
 
   <script>
-    const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=12";
+    const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=15";
 
     async function getImages() {
-      try {
-        const response = await fetch(arenaData);
-        const result = await response.json();
+      const response = await fetch(arenaData);
+      const result = await response.json();
+      const items = result.data;
 
-        console.log("API result:", result);
+      const page = document.getElementById("page");
+      let bubbles = [];
 
-        const items = result.data || result.contents || [];
-        const page = document.getElementById("page");
-        let list = [];
+      items.forEach(block => {
+        const imageURL =
+          block.image?.display?.url ||
+          block.image?.original?.url ||
+          block.image?.thumb?.url;
 
-        items.forEach(block => {
-          const imageURL =
-            block.image?.display?.url ||
-            block.image?.original?.url ||
-            block.image?.thumb?.url ||
-            block.image?.src;
+        if (!imageURL) return;
 
-          if (!imageURL) return;
+        let size = Math.random() * 150 + 180;
+        let x, y, isClear;
 
-          let size = Math.random() * 90 + 80; 
-          let x, y, ok;
-          let tries = 0;
+        do {
+          isClear = true;
 
-          do {
-            ok = true;
-            x = Math.random() * (window.innerWidth - size);
-            y = Math.random() * (window.innerHeight - size);
+          x = Math.random() * (window.innerWidth - size);
+          y = Math.random() * (window.innerHeight - size);
 
-            for (let i = 0; i < list.length; i++) {
-              let dx = (x + size/2) - (list[i].x + list[i].size/2);
-              let dy = (y + size/2) - (list[i].y + list[i].size/2);
-              let dist = Math.sqrt(dx*dx + dy*dy);
+          for (let i = 0; i < bubbles.length; i++) {
+            let dx = (x + size / 2) - (bubbles[i].x + bubbles[i].size / 2);
+            let dy = (y + size / 2) - (bubbles[i].y + bubbles[i].size / 2);
+            let distance = Math.sqrt(dx * dx + dy * dy);
 
-              if (dist < size/2 + list[i].size/2 + 10) {
-                ok = false;
-                break;
-              }
+            if (distance < size / 2 + bubbles[i].size / 2 + 20) {
+              isClear = false;
+              break;
             }
+          }
+        } while (!isClear);
 
-            tries++;
-            if (tries > 100) return; 
-          } while (!ok);
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.style.width = size + "px";
+        bubble.style.height = size + "px";
+        bubble.style.left = x + "px";
+        bubble.style.top = y + "px";
 
-          const bubble = document.createElement("div");
-          bubble.className = "b";
-          bubble.style.width = size + "px";
-          bubble.style.height = size + "px";
-          bubble.style.left = x + "px";
-          bubble.style.top = y + "px";
+        const photo = document.createElement("div");
+        photo.className = "photo";
 
-          const img = document.createElement("img");
-          img.src = imageURL;
+        const img = document.createElement("img");
+        img.src = imageURL;
 
-          bubble.appendChild(img);
-          page.appendChild(bubble);
+        const info = document.createElement("div");
+        info.className = "info";
+        info.innerText = "title / urgent level";
 
-          list.push({ x:x, y:y, size:size });
-        });
+        photo.appendChild(img);
+        bubble.appendChild(photo);
+        bubble.appendChild(info);
+        page.appendChild(bubble);
 
-      } catch (error) {
-        console.error("Fetch error:", error);
-      }
+        bubbles.push({ x: x, y: y, size: size });
+      });
     }
 
     getImages();
