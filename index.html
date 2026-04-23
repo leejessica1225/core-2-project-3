@@ -52,7 +52,6 @@
     }
   </style>
 </head>
-
 <body>
   <div class="page" id="page">
     <div class="title">
@@ -63,22 +62,31 @@
   </div>
 
   <script>
-    const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=30";
+    const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=12";
 
     async function getImages() {
       try {
         const response = await fetch(arenaData);
         const result = await response.json();
-        const items = result.data;   // 여기 중요
+
+        console.log("API result:", result);
+
+        const items = result.data || result.contents || [];
         const page = document.getElementById("page");
         let list = [];
 
         items.forEach(block => {
-          const imageURL = block.image?.display?.url || block.image?.original?.url || block.image?.thumb?.url;
+          const imageURL =
+            block.image?.display?.url ||
+            block.image?.original?.url ||
+            block.image?.thumb?.url ||
+            block.image?.src;
+
           if (!imageURL) return;
 
-          let size = Math.random() * 150 + 80;
-          let x, y, ok, tries = 0;
+          let size = Math.random() * 90 + 80; // 80~170
+          let x, y, ok;
+          let tries = 0;
 
           do {
             ok = true;
@@ -97,7 +105,7 @@
             }
 
             tries++;
-            if (tries > 200) return;
+            if (tries > 100) return; // 자리 없으면 그냥 그 버블은 건너뜀
           } while (!ok);
 
           const bubble = document.createElement("div");
@@ -117,7 +125,7 @@
         });
 
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Fetch error:", error);
       }
     }
 
