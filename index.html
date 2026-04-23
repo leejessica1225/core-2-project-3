@@ -40,8 +40,6 @@
 
     .bubble {
       position: absolute;
-      width: 300px;
-      height: 230px;
       background: #d3d3d3;
       border-radius: 50%;
     }
@@ -49,46 +47,91 @@
     .photo {
       position: absolute;
       width: 70%;
-      height: 55%;
+      height: 50%;
       left: 15%;
-      top: 15%;
+      top: 16%;
       background: #aaa;
       border-radius: 50%;
     }
 
     .info {
       position: absolute;
-      left: 50px;
-      bottom: 35px;
-      font-size: 22px;
-      transform: rotate(35deg);
+      width: 100%;
+      bottom: 18%;
+      text-align: center;
+      font-size: 18px;
     }
   </style>
 </head>
 
 <body>
-  <div class="page">
+  <div class="page" id="page">
     <div class="title">
       <span>PARSONS SURVIVAL</span><br>
       <span>NETWORK</span>
     </div>
 
     <div class="mode">offering</div>
-
-    <div class="bubble" style="left:120px; top:120px;">
-      <div class="photo"></div>
-      <div class="info">title / urgent level</div>
-    </div>
-
-    <div class="bubble" style="left:520px; top:180px;">
-      <div class="photo"></div>
-      <div class="info">title / urgent level</div>
-    </div>
-
-    <div class="bubble" style="left:250px; top:480px;">
-      <div class="photo"></div>
-      <div class="info">title / urgent level</div>
-    </div>
   </div>
+
+  <script>
+    let page = document.getElementById("page");
+    let bubbles = [];
+
+    for (let i = 0; i < 8; i++) {
+      let width = Math.random() * 180 + 220;
+      let height = width * 0.75;
+
+      let x;
+      let y;
+      let clear;
+
+      do {
+        clear = true;
+
+        x = Math.random() * (window.innerWidth - width);
+        y = Math.random() * (window.innerHeight - height);
+
+        for (let j = 0; j < bubbles.length; j++) {
+          let b = bubbles[j];
+
+          let overlap =
+            x < b.x + b.width + 20 &&
+            x + width + 20 > b.x &&
+            y < b.y + b.height + 20 &&
+            y + height + 20 > b.y;
+
+          if (overlap) {
+            clear = false;
+          }
+        }
+      } while (!clear);
+
+      let bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.style.width = width + "px";
+      bubble.style.height = height + "px";
+      bubble.style.left = x + "px";
+      bubble.style.top = y + "px";
+
+      let photo = document.createElement("div");
+      photo.className = "photo";
+
+      let info = document.createElement("div");
+      info.className = "info";
+      info.innerText = "title / urgent level";
+
+      bubble.appendChild(photo);
+      bubble.appendChild(info);
+      page.appendChild(bubble);
+
+      bubbles.push({
+        x: x,
+        y: y,
+        width: width,
+        height: height
+      });
+    }
+  </script>
 </body>
 </html>
