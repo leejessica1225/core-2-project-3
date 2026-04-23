@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Parsons Survival Network</title>
+
+<style>
+body{
+  margin:0;
+  background:#eee;
+  font-family:Arial;
+}
+
+.page{
+  position:relative;
+  height:100vh;
+  overflow:hidden;
+  border:2px solid #000;
+}
+
+.title{
+  position:absolute;
+  top:30px;
+  left:30px;
+  font-size:26px;
+  line-height:1.2;
+}
+
+.title span{
+  border-bottom:4px solid #000;
+}
+
+.mode{
+  position:absolute;
+  top:40px;
+  right:100px;
+  font-size:30px;
+}
+
+.b{
+  position:absolute;
+  background:#d3d3d3;
+  border-radius:50%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="page" id="page">
+  <div class="title">
+    <span>PARSONS SURVIVAL</span><br>
+    <span>NETWORK</span>
+  </div>
+
+  <div class="mode">offering</div>
+</div>
+
+<script>
+let page = document.getElementById("page");
+
+for(let i=0;i<20;i++){
+  let b = document.createElement("div");
+  b.className = "b";
+
+  let size = Math.random()*200 + 50;
+
+  b.style.width = size + "px";
+  b.style.height = size + "px";
+
+  b.style.left = Math.random()*(window.innerWidth - size) + "px";
+  b.style.top = Math.random()*(window.innerHeight - size) + "px";
+
+  b.style.opacity = Math.random()*0.5 + 0.3;
+
+  page.appendChild(b);
+}
+</script>
+
+</body>
+</html>
