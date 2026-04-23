@@ -40,6 +40,8 @@
 
     .bubble {
       position: absolute;
+      width: 300px;
+      height: 230px;
       background: #d3d3d3;
       border-radius: 50%;
     }
@@ -50,104 +52,43 @@
       height: 55%;
       left: 15%;
       top: 15%;
-      border-radius: 50%;
-      overflow: hidden;
       background: #aaa;
-    }
-
-    .photo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      border-radius: 50%;
     }
 
     .info {
       position: absolute;
-      left: 60px;
-      bottom: 40px;
-      font-size: 20px;
+      left: 50px;
+      bottom: 35px;
+      font-size: 22px;
       transform: rotate(35deg);
     }
   </style>
 </head>
 
 <body>
-  <div class="page" id="page">
+  <div class="page">
     <div class="title">
       <span>PARSONS SURVIVAL</span><br>
       <span>NETWORK</span>
     </div>
 
     <div class="mode">offering</div>
+
+    <div class="bubble" style="left:120px; top:120px;">
+      <div class="photo"></div>
+      <div class="info">title / urgent level</div>
+    </div>
+
+    <div class="bubble" style="left:520px; top:180px;">
+      <div class="photo"></div>
+      <div class="info">title / urgent level</div>
+    </div>
+
+    <div class="bubble" style="left:250px; top:480px;">
+      <div class="photo"></div>
+      <div class="info">title / urgent level</div>
+    </div>
   </div>
-
-  <script>
-    const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=15";
-
-    async function getImages() {
-      const response = await fetch(arenaData);
-      const result = await response.json();
-      const items = result.data;
-
-      const page = document.getElementById("page");
-      let bubbles = [];
-
-      items.forEach(block => {
-        const imageURL =
-          block.image?.display?.url ||
-          block.image?.original?.url ||
-          block.image?.thumb?.url;
-
-        if (!imageURL) return;
-
-        let size = Math.random() * 150 + 180;
-        let x, y, isClear;
-
-        do {
-          isClear = true;
-
-          x = Math.random() * (window.innerWidth - size);
-          y = Math.random() * (window.innerHeight - size);
-
-          for (let i = 0; i < bubbles.length; i++) {
-            let dx = (x + size / 2) - (bubbles[i].x + bubbles[i].size / 2);
-            let dy = (y + size / 2) - (bubbles[i].y + bubbles[i].size / 2);
-            let distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < size / 2 + bubbles[i].size / 2 + 20) {
-              isClear = false;
-              break;
-            }
-          }
-        } while (!isClear);
-
-        const bubble = document.createElement("div");
-        bubble.className = "bubble";
-        bubble.style.width = size + "px";
-        bubble.style.height = size + "px";
-        bubble.style.left = x + "px";
-        bubble.style.top = y + "px";
-
-        const photo = document.createElement("div");
-        photo.className = "photo";
-
-        const img = document.createElement("img");
-        img.src = imageURL;
-
-        const info = document.createElement("div");
-        info.className = "info";
-        info.innerText = "title / urgent level";
-
-        photo.appendChild(img);
-        bubble.appendChild(photo);
-        bubble.appendChild(info);
-        page.appendChild(bubble);
-
-        bubbles.push({ x: x, y: y, size: size });
-      });
-    }
-
-    getImages();
-  </script>
 </body>
 </html>
