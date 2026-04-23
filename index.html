@@ -1,103 +1,124 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Parsons Survival Network</title>
+  <title>Parsons Survival Network</title>
+  <style>
+    body{
+      margin:0;
+      background:#eee;
+      font-family:Arial;
+    }
 
-<style>
-body{
-  margin:0;
-  background:#eee;
-  font-family:Arial;
-}
+    .page{
+      position:relative;
+      height:100vh;
+      overflow:hidden;
+      border:2px solid #000;
+    }
 
-.page{
-  position:relative;
-  height:100vh;
-  overflow:hidden;
-  border:2px solid #000;
-}
+    .title{
+      position:absolute;
+      top:30px;
+      left:30px;
+      font-size:26px;
+      line-height:1.2;
+      z-index:10;
+    }
 
-.title{
-  position:absolute;
-  top:30px;
-  left:30px;
-  font-size:26px;
-  line-height:1.2;
-  z-index:10;
-}
+    .title span{
+      border-bottom:4px solid #000;
+    }
 
-.title span{
-  border-bottom:4px solid #000;
-}
+    .mode{
+      position:absolute;
+      top:40px;
+      right:100px;
+      font-size:16px;
+      z-index:10;
+    }
 
-.mode{
-  position:absolute;
-  top:40px;
-  right:100px;
-  font-size:16px;
-  z-index:10;
-}
+    .b{
+      position:absolute;
+      border-radius:50%;
+      overflow:hidden;
+      background:#d3d3d3;
+    }
 
-.b{
-  position:absolute;
-  background:#d3d3d3;
-  border-radius:50%;
-}
-</style>
+    .b img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+  </style>
 </head>
 
 <body>
-
-<div class="page" id="page">
-  <div class="title">
-    <span>PARSONS SURVIVAL</span><br>
-    <span>NETWORK</span>
+  <div class="page" id="page">
+    <div class="title">
+      <span>PARSONS SURVIVAL</span><br>
+      <span>NETWORK</span>
+    </div>
+    <div class="mode">offering</div>
   </div>
 
-  <div class="mode">offering</div>
-</div>
+  <script>
+    const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=30";
 
-<script>
-let page = document.getElementById("page");
-let list = [];
+    async function getImages() {
+      try {
+        const response = await fetch(arenaData);
+        const result = await response.json();
+        const items = result.contents;
+        const page = document.getElementById("page");
+        let list = [];
 
-for(let i=0;i<20;i++){
+        items.forEach(block => {
+          const imageURL = block.image?.display?.url || block.image?.original?.url || block.image?.thumb?.url || block.image?.src;
+          if (!imageURL) return;
 
-  let b = document.createElement("div");
-  b.className = "b";
+          let size = Math.random() * 150 + 80;
+          let x, y, ok;
 
-  let size = Math.random()*150 + 80;
-  let x, y, ok;
+          do {
+            ok = true;
+            x = Math.random() * (window.innerWidth - size);
+            y = Math.random() * (window.innerHeight - size);
 
-  do{
-    ok = true;
+            for (let i = 0; i < list.length; i++) {
+              let dx = (x + size/2) - (list[i].x + list[i].size/2);
+              let dy = (y + size/2) - (list[i].y + list[i].size/2);
+              let dist = Math.sqrt(dx*dx + dy*dy);
 
-    x = Math.random()*(window.innerWidth - size);
-    y = Math.random()*(window.innerHeight - size);
+              if (dist < size/2 + list[i].size/2 + 10) {
+                ok = false;
+                break;
+              }
+            }
+          } while (!ok);
 
-    for(let j=0;j<list.length;j++){
-      let dx = x - list[j].x;
-      let dy = y - list[j].y;
-      let dist = Math.sqrt(dx*dx + dy*dy);
+          const bubble = document.createElement("div");
+          bubble.className = "b";
+          bubble.style.width = size + "px";
+          bubble.style.height = size + "px";
+          bubble.style.left = x + "px";
+          bubble.style.top = y + "px";
 
-      if(dist < size/2 + list[j].size/2 + 10){
-        ok = false;
-        break;
+          const img = document.createElement("img");
+          img.src = imageURL;
+
+          bubble.appendChild(img);
+          page.appendChild(bubble);
+
+          list.push({ x:x, y:y, size:size });
+        });
+
+      } catch (error) {
+        console.error("Error:", error);
       }
     }
 
-  }while(!ok);
-
-  b.style.width = size + "px";
-  b.style.height = size + "px";
-  b.style.left = x + "px";
-  b.style.top = y + "px";
-
-  page.appendChild(b);
-
-  list.push({x:x, y:y, size:size});
-}
-</script>
-
+    getImages();
+  </script>
 </body>
 </html>
