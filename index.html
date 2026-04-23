@@ -103,14 +103,15 @@
         if (!imageURL) return;
 
         let sizes = [
-          { w: 200, h: 150 },
-          { w: 300, h: 220 },
-          { w: 420, h: 300 }
+          { w: 140, h: 100 },
+          { w: 320, h: 230 },
+          { w: 600, h: 430 }
         ];
 
-        let pick = sizes[Math.floor(Math.random() * 3)];
-        let w = pick.w;
-        let h = pick.h;
+        let base = sizes[Math.floor(Math.random() * 3)];
+
+        let w = base.w + (Math.random() * 40 - 20);
+        let h = base.h + (Math.random() * 30 - 15);
 
         let x, y, ok;
         let tries = 0;
