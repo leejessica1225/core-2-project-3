@@ -66,12 +66,13 @@
       width: 100%;
       bottom: 18%;
       text-align: center;
-      font-size: 18px;
+      font-size: 16px;
     }
   </style>
 </head>
 
 <body>
+
   <div class="page" id="page">
     <div class="title">
       <span>PARSONS SURVIVAL</span><br>
@@ -84,15 +85,17 @@
   <script>
     const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=20";
 
-    async function getPosts() {
-      const response = await fetch(arenaData);
-      const result = await response.json();
-      const items = result.data;
+    async function loadBubbles() {
 
-      let page = document.getElementById("page");
-      let bubbles = [];
+      const res = await fetch(arenaData);
+      const data = await res.json();
+      const items = data.data;
+
+      const page = document.getElementById("page");
+      let placed = [];
 
       items.forEach(block => {
+
         let imageURL =
           block.image?.display?.url ||
           block.image?.original?.url ||
@@ -101,43 +104,42 @@
 
         if (!imageURL) return;
 
-        let width = Math.random() * 180 + 220;
-        let height = width * 0.75;
+        let w = Math.random() * 180 + 220;
+        let h = w * 0.75;
 
-        let x;
-        let y;
-        let clear;
+        let x, y, ok;
         let tries = 0;
 
         do {
-          clear = true;
+          ok = true;
 
-          x = Math.random() * (window.innerWidth - width);
-          y = Math.random() * (window.innerHeight - height);
+          x = Math.random() * (window.innerWidth - w);
+          y = Math.random() * (window.innerHeight - h);
 
-          for (let j = 0; j < bubbles.length; j++) {
-            let b = bubbles[j];
+          for (let i = 0; i < placed.length; i++) {
+            let b = placed[i];
 
             let overlap =
-              x < b.x + b.width + 20 &&
-              x + width + 20 > b.x &&
-              y < b.y + b.height + 20 &&
-              y + height + 20 > b.y;
+              x < b.x + b.w + 20 &&
+              x + w + 20 > b.x &&
+              y < b.y + b.h + 20 &&
+              y + h + 20 > b.y;
 
             if (overlap) {
-              clear = false;
+              ok = false;
+              break;
             }
           }
 
           tries++;
           if (tries > 100) return;
 
-        } while (!clear);
+        } while (!ok);
 
         let bubble = document.createElement("div");
         bubble.className = "bubble";
-        bubble.style.width = width + "px";
-        bubble.style.height = height + "px";
+        bubble.style.width = w + "px";
+        bubble.style.height = h + "px";
         bubble.style.left = x + "px";
         bubble.style.top = y + "px";
 
@@ -149,23 +151,20 @@
 
         let info = document.createElement("div");
         info.className = "info";
-        info.innerText = block.title || "title / urgent level";
+        info.innerText = "title / urgency level";
 
         photo.appendChild(img);
         bubble.appendChild(photo);
         bubble.appendChild(info);
         page.appendChild(bubble);
 
-        bubbles.push({
-          x: x,
-          y: y,
-          width: width,
-          height: height
-        });
+        placed.push({ x: x, y: y, w: w, h: h });
+
       });
     }
 
-    getPosts();
+    loadBubbles();
   </script>
+
 </body>
 </html>
