@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Parsons Survival Network</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: white;
+      font-family: Arial;
+    }
+
+    .page {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      border: 2px solid black;
+    }
+
+    .title {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      font-size: 26px;
+      line-height: 1.2;
+      z-index: 10;
+    }
+
+    .title span {
+      border-bottom: 4px solid black;
+    }
+
+    .mode {
+      position: absolute;
+      top: 45px;
+      right: 95px;
+      font-size: 26px;
+      z-index: 10;
+      text-decoration: none;
+      color: black;
+    }
+
+    .bubble {
+      position: absolute;
+      background: #d3d3d3;
+      border-radius: 50%;
+    }
+
+    .photo {
+      position: absolute;
+      width: 80%;
+      height: 65%;
+      left: 10%;
+      top: 10%;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #aaa;
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .info {
+      position: absolute;
+      width: 100%;
+      bottom: 14%;
+      text-align: center;
+      font-size: 15px;
+      transform: rotate(15deg);
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="page" id="page">
+  <div class="title">
+    <span>PARSONS SURVIVAL</span><br>
+    <span>NETWORK</span>
+  </div>
+
+  <a href="index.html" class="mode">requesting</a>
+</div>
+
+<script>
+const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=20";
+
+async function loadBubbles() {
+  const res = await fetch(arenaData);
+  const data = await res.json();
+  const items = data.data;
+
+  const page = document.getElementById("page");
+  let placed = [];
+
+  let sizes = [
+    { w: 100, h: 70 },
+    { w: 190, h: 130 },
+    { w: 330, h: 220 }
+  ];
+
+  items.forEach((block, i) => {
+    let imageURL =
+      block.image?.display?.url ||
+      block.image?.original?.url ||
+      block.image?.thumb?.url ||
+      block.image?.src;
+
+    if (!imageURL) return;
+
+    let base = sizes[Math.floor(Math.random() * 3)];
+    let w = base.w;
+    let h = base.h;
+
+    let x, y, ok;
+    let tries = 0;
+
+    do {
+      ok = true;
+
+      x = 40 + Math.random() * (page.clientWidth - w - 80);
+      y = 120 + Math.random() * (page.clientHeight - h - 180);
+
+      if (i === 0) {
+        w = 330;
+        h = 220;
+        x = page.clientWidth / 2 - w / 2;
+        y = page.clientHeight / 2 - h / 2;
+      }
+
+      for (let j = 0; j < placed.length; j++) {
+        let b = placed[j];
+        let gap = 35;
+
+        let overlap =
+          x < b.x + b.w + gap &&
+          x + w + gap > b.x &&
+          y < b.y + b.h + gap &&
+          y + h + gap > b.y;
+
+        if (overlap) {
+          ok = false;
+          break;
+        }
+      }
+
+      tries++;
+      if (tries > 100) return;
+
+    } while (!ok);
+
+    let bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.style.width = w + "px";
+    bubble.style.height = h + "px";
+    bubble.style.left = x + "px";
+    bubble.style.top = y + "px";
+
+    let photo = document.createElement("div");
+    photo.className = "photo";
+
+    let img = document.createElement("img");
+    img.src = imageURL;
+
+    let info = document.createElement("div");
+    info.className = "info";
+    info.innerText = "title / urgency level";
+
+    photo.appendChild(img);
+    bubble.appendChild(photo);
+    bubble.appendChild(info);
+    page.appendChild(bubble);
+
+    placed.push({ x: x, y: y, w: w, h: h });
+  });
+}
+
+loadBubbles();
+</script>
+
+</body>
+</html>
