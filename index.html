@@ -40,11 +40,11 @@
 
     .bubble-area {
       position: absolute;
-      width: 1200px;
-      height: 760px;
+      width: 1150px;
+      height: 850px;
       left: 50%;
-      top: 52%;
-      transform: translate(-50%, -50%);
+      top: 95px;
+      transform: translateX(-50%);
     }
 
     .bubble {
@@ -113,21 +113,21 @@
 const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=12";
 
 let layout = [
-  { x: 170, y: 120, size: "large" },
-  { x: 520, y: 165, size: "medium" },
-  { x: 740, y: 75, size: "large" },
+  { x: 155, y: 80, size: "large" },
+  { x: 510, y: 120, size: "medium" },
+  { x: 725, y: 35, size: "large" },
 
-  { x: -70, y: 320, size: "large" },
-  { x: 250, y: 405, size: "small" },
-  { x: 410, y: 380, size: "large" },
+  { x: -110, y: 295, size: "large" },
+  { x: 240, y: 380, size: "small" },
+  { x: 390, y: 345, size: "large" },
 
-  { x: 735, y: 315, size: "small" },
-  { x: 805, y: 420, size: "medium" },
-  { x: 170, y: 535, size: "medium" },
+  { x: 720, y: 285, size: "small" },
+  { x: 790, y: 390, size: "medium" },
+  { x: 160, y: 500, size: "medium" },
 
-  { x: 760, y: 620, size: "small" },
-  { x: 925, y: 540, size: "large" },
-  { x: 355, y: 690, size: "large" }
+  { x: 745, y: 585, size: "small" },
+  { x: 905, y: 520, size: "large" },
+  { x: 340, y: 660, size: "large" }
 ];
 
 async function loadBubbles() {
