@@ -33,7 +33,7 @@
     .mode {
       position: absolute;
       top: 45px;
-      right: 95px;
+      right: 100px;
       font-size: 26px;
       z-index: 10;
     }
@@ -46,13 +46,13 @@
 
     .photo {
       position: absolute;
-      width: 80%;
-      height: 65%;
-      left: 10%;
-      top: 10%;
+      width: 70%;
+      height: 58%;
+      left: 15%;
+      top: 12%;
+      background: #aaa;
       border-radius: 50%;
       overflow: hidden;
-      background: #aaa;
     }
 
     .photo img {
@@ -64,120 +64,104 @@
     .info {
       position: absolute;
       width: 100%;
-      bottom: 14%;
+      bottom: 15%;
       text-align: center;
-      font-size: 15px;
-      transform: rotate(15deg);
+      font-size: 18px;
+      transform: rotate(22deg);
+    }
+
+    .small {
+      width: 90px;
+      height: 60px;
+    }
+
+    .medium {
+      width: 180px;
+      height: 130px;
+    }
+
+    .large {
+      width: 320px;
+      height: 240px;
     }
   </style>
 </head>
 
 <body>
 
-<div class="page" id="page">
-  <div class="title">
-    <span>PARSONS SURVIVAL</span><br>
-    <span>NETWORK</span>
+  <div class="page" id="page">
+    <div class="title">
+      <span>PARSONS SURVIVAL</span><br>
+      <span>NETWORK</span>
+    </div>
+
+    <div class="mode">offering</div>
   </div>
 
-  <div class="mode">offering</div>
-</div>
+  <script>
+    const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=12";
 
-<script>
-const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=20";
+    let layout = [
+      { x: 170, y: 165, size: "large" },
+      { x: 525, y: 208, size: "medium" },
+      { x: 740, y: 120, size: "large" },
+      { x: -110, y: 365, size: "large" },
+      { x: 252, y: 455, size: "small" },
+      { x: 402, y: 420, size: "large" },
+      { x: 740, y: 360, size: "small" },
+      { x: 800, y: 460, size: "medium" },
+      { x: 172, y: 568, size: "medium" },
+      { x: 760, y: 668, size: "small" },
+      { x: 925, y: 580, size: "large" },
+      { x: 355, y: 742, size: "large" }
+    ];
 
-async function loadBubbles() {
-  const res = await fetch(arenaData);
-  const data = await res.json();
-  const items = data.data;
+    async function loadBubbles() {
+      const res = await fetch(arenaData);
+      const data = await res.json();
+      const items = data.data;
 
-  const page = document.getElementById("page");
-  let placed = [];
+      const page = document.getElementById("page");
 
-  let sizes = [
-    { w: 100, h: 70 },
-    { w: 190, h: 130 },
-    { w: 330, h: 220 }
-  ];
+      layout.forEach((spot, i) => {
+        let block = items[i];
+        if (!block) return;
 
-  items.forEach((block, i) => {
-    let imageURL =
-      block.image?.display?.url ||
-      block.image?.original?.url ||
-      block.image?.thumb?.url ||
-      block.image?.src;
+        let imageURL =
+          block.image?.display?.url ||
+          block.image?.original?.url ||
+          block.image?.thumb?.url ||
+          block.image?.src;
 
-    if (!imageURL) return;
+        let bubble = document.createElement("div");
+        bubble.className = "bubble " + spot.size;
+        bubble.style.left = spot.x + "px";
+        bubble.style.top = spot.y + "px";
 
-    let base = sizes[Math.floor(Math.random() * 3)];
-    let w = base.w;
-    let h = base.h;
+        if (spot.size === "large" || spot.size === "medium") {
+          let photo = document.createElement("div");
+          photo.className = "photo";
 
-    let x, y, ok;
-    let tries = 0;
+          if (imageURL) {
+            let img = document.createElement("img");
+            img.src = imageURL;
+            photo.appendChild(img);
+          }
 
-    do {
-      ok = true;
+          let info = document.createElement("div");
+          info.className = "info";
+          info.innerText = "title / urgent level";
 
-      x = 40 + Math.random() * (page.clientWidth - w - 80);
-      y = 120 + Math.random() * (page.clientHeight - h - 180);
-
-      if (i === 0) {
-        w = 330;
-        h = 220;
-        x = page.clientWidth / 2 - w / 2;
-        y = page.clientHeight / 2 - h / 2;
-      }
-
-      for (let j = 0; j < placed.length; j++) {
-        let b = placed[j];
-        let gap = 35;
-
-        let overlap =
-          x < b.x + b.w + gap &&
-          x + w + gap > b.x &&
-          y < b.y + b.h + gap &&
-          y + h + gap > b.y;
-
-        if (overlap) {
-          ok = false;
-          break;
+          bubble.appendChild(photo);
+          bubble.appendChild(info);
         }
-      }
 
-      tries++;
-      if (tries > 100) return;
+        page.appendChild(bubble);
+      });
+    }
 
-    } while (!ok);
-
-    let bubble = document.createElement("div");
-    bubble.className = "bubble";
-    bubble.style.width = w + "px";
-    bubble.style.height = h + "px";
-    bubble.style.left = x + "px";
-    bubble.style.top = y + "px";
-
-    let photo = document.createElement("div");
-    photo.className = "photo";
-
-    let img = document.createElement("img");
-    img.src = imageURL;
-
-    let info = document.createElement("div");
-    info.className = "info";
-    info.innerText = "title / urgency level";
-
-    photo.appendChild(img);
-    bubble.appendChild(photo);
-    bubble.appendChild(info);
-    page.appendChild(bubble);
-
-    placed.push({ x: x, y: y, w: w, h: h });
-  });
-}
-
-loadBubbles();
-</script>
+    loadBubbles();
+  </script>
 
 </body>
 </html>
