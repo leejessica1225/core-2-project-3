@@ -131,12 +131,13 @@ async function loadBubbles() {
 
       for (let j = 0; j < placed.length; j++) {
         let b = placed[j];
+        let gap = 35;
 
         let overlap =
-          x < b.x + b.w &&
-          x + w > b.x &&
-          y < b.y + b.h &&
-          y + h > b.y;
+          x < b.x + b.w + gap &&
+          x + w + gap > b.x &&
+          y < b.y + b.h + gap &&
+          y + h + gap > b.y;
 
         if (overlap) {
           ok = false;
