@@ -119,14 +119,14 @@ async function loadBubbles() {
     do {
       ok = true;
 
-      x = Math.random() * window.innerWidth * 0.7 + window.innerWidth * 0.15;
-      y = Math.random() * window.innerHeight * 0.6 + window.innerHeight * 0.2;
+      x = 40 + Math.random() * (page.clientWidth - w - 80);
+      y = 120 + Math.random() * (page.clientHeight - h - 180);
 
       if (i === 0) {
-        w = 360;
-        h = 240;
-        x = window.innerWidth / 2 - w / 2;
-        y = window.innerHeight / 2 - h / 2;
+        w = 330;
+        h = 220;
+        x = page.clientWidth / 2 - w / 2;
+        y = page.clientHeight / 2 - h / 2;
       }
 
       for (let j = 0; j < placed.length; j++) {
