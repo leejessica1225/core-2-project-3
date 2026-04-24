@@ -33,18 +33,9 @@
     .mode {
       position: absolute;
       top: 45px;
-      right: 100px;
+      right: 95px;
       font-size: 26px;
       z-index: 10;
-    }
-
-    .bubble-area {
-      position: absolute;
-      width: 1150px;
-      height: 850px;
-      left: 50%;
-      top: 95px;
-      transform: translateX(-50%);
     }
 
     .bubble {
@@ -55,13 +46,13 @@
 
     .photo {
       position: absolute;
-      width: 70%;
-      height: 58%;
-      left: 15%;
-      top: 12%;
-      background: #aaa;
+      width: 80%;
+      height: 65%;
+      left: 10%;
+      top: 10%;
       border-radius: 50%;
       overflow: hidden;
+      background: #aaa;
     }
 
     .photo img {
@@ -73,104 +64,115 @@
     .info {
       position: absolute;
       width: 100%;
-      bottom: 15%;
+      bottom: 14%;
       text-align: center;
-      font-size: 18px;
-      transform: rotate(22deg);
-    }
-
-    .small {
-      width: 90px;
-      height: 60px;
-    }
-
-    .medium {
-      width: 180px;
-      height: 130px;
-    }
-
-    .large {
-      width: 320px;
-      height: 240px;
+      font-size: 15px;
+      transform: rotate(15deg);
     }
   </style>
 </head>
 
 <body>
 
-<div class="page">
+<div class="page" id="page">
   <div class="title">
     <span>PARSONS SURVIVAL</span><br>
     <span>NETWORK</span>
   </div>
 
   <div class="mode">offering</div>
-
-  <div class="bubble-area" id="bubbleArea"></div>
 </div>
 
 <script>
-const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=12";
-
-let layout = [
-  { x: 155, y: 80, size: "large" },
-  { x: 510, y: 120, size: "medium" },
-  { x: 725, y: 35, size: "large" },
-
-  { x: -110, y: 295, size: "large" },
-  { x: 240, y: 380, size: "small" },
-  { x: 390, y: 345, size: "large" },
-
-  { x: 720, y: 285, size: "small" },
-  { x: 790, y: 390, size: "medium" },
-  { x: 160, y: 500, size: "medium" },
-
-  { x: 745, y: 585, size: "small" },
-  { x: 905, y: 520, size: "large" },
-  { x: 340, y: 660, size: "large" }
-];
+const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=20";
 
 async function loadBubbles() {
   const res = await fetch(arenaData);
   const data = await res.json();
   const items = data.data;
 
-  const area = document.getElementById("bubbleArea");
+  const page = document.getElementById("page");
+  let placed = [];
 
-  layout.forEach((spot, i) => {
-    let block = items[i];
-    if (!block) return;
+  let sizes = [
+    { w: 100, h: 70 },
+    { w: 190, h: 130 },
+    { w: 330, h: 220 }
+  ];
 
+  items.forEach((block, i) => {
     let imageURL =
       block.image?.display?.url ||
       block.image?.original?.url ||
       block.image?.thumb?.url ||
       block.image?.src;
 
-    let bubble = document.createElement("div");
-    bubble.className = "bubble " + spot.size;
-    bubble.style.left = spot.x + "px";
-    bubble.style.top = spot.y + "px";
+    if (!imageURL) return;
 
-    if (spot.size !== "small") {
-      let photo = document.createElement("div");
-      photo.className = "photo";
+    let base = sizes[Math.floor(Math.random() * 3)];
+    let w = base.w;
+    let h = base.h;
 
-      if (imageURL) {
-        let img = document.createElement("img");
-        img.src = imageURL;
-        photo.appendChild(img);
+    let x, y, ok;
+    let tries = 0;
+
+    do {
+      ok = true;
+
+      x = 40 + Math.random() * (page.clientWidth - w - 80);
+      y = 120 + Math.random() * (page.clientHeight - h - 180);
+
+      if (i === 0) {
+        w = 330;
+        h = 220;
+        x = page.clientWidth / 2 - w / 2;
+        y = page.clientHeight / 2 - h / 2;
       }
 
-      let info = document.createElement("div");
-      info.className = "info";
-      info.innerText = "title / urgent level";
+      for (let j = 0; j < placed.length; j++) {
+        let b = placed[j];
+        let gap = 35;
 
-      bubble.appendChild(photo);
-      bubble.appendChild(info);
-    }
+        let overlap =
+          x < b.x + b.w + gap &&
+          x + w + gap > b.x &&
+          y < b.y + b.h + gap &&
+          y + h + gap > b.y;
 
-    area.appendChild(bubble);
+        if (overlap) {
+          ok = false;
+          break;
+        }
+      }
+
+      tries++;
+      if (tries > 100) return;
+
+    } while (!ok);
+
+    let bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.style.width = w + "px";
+    bubble.style.height = h + "px";
+    bubble.style.left = x + "px";
+    bubble.style.top = y + "px";
+
+    let photo = document.createElement("div");
+    photo.className = "photo";
+
+    let img = document.createElement("img");
+    img.src = imageURL;
+
+    let info = document.createElement("div");
+    info.className = "info";
+    info.innerText = "title / urgency level";
+
+    photo.appendChild(img);
+    bubble.appendChild(photo);
+    bubble.appendChild(info);
+    page.appendChild(bubble);
+
+    placed.push({ x: x, y: y, w: w, h: h });
   });
 }
 
