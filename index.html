@@ -89,79 +89,80 @@
 
 <body>
 
-  <div class="page" id="page">
-    <div class="title">
-      <span>PARSONS SURVIVAL</span><br>
-      <span>NETWORK</span>
-    </div>
-
-    <div class="mode">offering</div>
+<div class="page" id="page">
+  <div class="title">
+    <span>PARSONS SURVIVAL</span><br>
+    <span>NETWORK</span>
   </div>
 
-  <script>
-    const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=12";
+  <div class="mode">offering</div>
+</div>
 
-    let layout = [
-      { x: 170, y: 165, size: "large" },
-      { x: 525, y: 208, size: "medium" },
-      { x: 740, y: 120, size: "large" },
-      { x: -110, y: 365, size: "large" },
-      { x: 252, y: 455, size: "small" },
-      { x: 402, y: 420, size: "large" },
-      { x: 740, y: 360, size: "small" },
-      { x: 800, y: 460, size: "medium" },
-      { x: 172, y: 568, size: "medium" },
-      { x: 760, y: 668, size: "small" },
-      { x: 925, y: 580, size: "large" },
-      { x: 355, y: 742, size: "large" }
-    ];
+<script>
+const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=12";
 
-    async function loadBubbles() {
-      const res = await fetch(arenaData);
-      const data = await res.json();
-      const items = data.data;
+let layout = [
+  { x: 170, y: 165, size: "large" },
+  { x: 525, y: 208, size: "medium" },
+  { x: 740, y: 120, size: "large" },
+  { x: -110, y: 365, size: "large" },
+  { x: 252, y: 455, size: "small" },
+  { x: 402, y: 420, size: "large" },
+  { x: 740, y: 360, size: "small" },
+  { x: 800, y: 460, size: "medium" },
+  { x: 172, y: 568, size: "medium" },
+  { x: 760, y: 668, size: "small" },
+  { x: 925, y: 580, size: "large" },
+  { x: 355, y: 742, size: "large" }
+];
 
-      const page = document.getElementById("page");
+async function loadBubbles() {
+  const res = await fetch(arenaData);
+  const data = await res.json();
+  const items = data.data;
 
-      layout.forEach((spot, i) => {
-        let block = items[i];
-        if (!block) return;
+  const page = document.getElementById("page");
+  let shiftX = -120;
 
-        let imageURL =
-          block.image?.display?.url ||
-          block.image?.original?.url ||
-          block.image?.thumb?.url ||
-          block.image?.src;
+  layout.forEach((spot, i) => {
+    let block = items[i];
+    if (!block) return;
 
-        let bubble = document.createElement("div");
-        bubble.className = "bubble " + spot.size;
-        bubble.style.left = spot.x + "px";
-        bubble.style.top = spot.y + "px";
+    let imageURL =
+      block.image?.display?.url ||
+      block.image?.original?.url ||
+      block.image?.thumb?.url ||
+      block.image?.src;
 
-        if (spot.size === "large" || spot.size === "medium") {
-          let photo = document.createElement("div");
-          photo.className = "photo";
+    let bubble = document.createElement("div");
+    bubble.className = "bubble " + spot.size;
+    bubble.style.left = (spot.x + shiftX) + "px";
+    bubble.style.top = spot.y + "px";
 
-          if (imageURL) {
-            let img = document.createElement("img");
-            img.src = imageURL;
-            photo.appendChild(img);
-          }
+    if (spot.size !== "small") {
+      let photo = document.createElement("div");
+      photo.className = "photo";
 
-          let info = document.createElement("div");
-          info.className = "info";
-          info.innerText = "title / urgent level";
+      if (imageURL) {
+        let img = document.createElement("img");
+        img.src = imageURL;
+        photo.appendChild(img);
+      }
 
-          bubble.appendChild(photo);
-          bubble.appendChild(info);
-        }
+      let info = document.createElement("div");
+      info.className = "info";
+      info.innerText = "title / urgent level";
 
-        page.appendChild(bubble);
-      });
+      bubble.appendChild(photo);
+      bubble.appendChild(info);
     }
 
-    loadBubbles();
-  </script>
+    page.appendChild(bubble);
+  });
+}
+
+loadBubbles();
+</script>
 
 </body>
 </html>
