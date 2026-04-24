@@ -6,7 +6,7 @@
   <style>
     body {
       margin: 0;
-      background: #eee;
+      background: white;
       font-family: Arial;
     }
 
@@ -32,9 +32,9 @@
 
     .mode {
       position: absolute;
-      top: 40px;
-      right: 100px;
-      font-size: 16px;
+      top: 45px;
+      right: 95px;
+      font-size: 26px;
       z-index: 10;
     }
 
@@ -50,9 +50,9 @@
       height: 65%;
       left: 10%;
       top: 10%;
-      background: #aaa;
       border-radius: 50%;
       overflow: hidden;
+      background: #aaa;
     }
 
     .photo img {
@@ -64,112 +64,119 @@
     .info {
       position: absolute;
       width: 100%;
-      bottom: 12%;
+      bottom: 14%;
       text-align: center;
-      font-size: 16px;
+      font-size: 15px;
+      transform: rotate(15deg);
     }
   </style>
 </head>
 
 <body>
 
-  <div class="page" id="page">
-    <div class="title">
-      <span>PARSONS SURVIVAL</span><br>
-      <span>NETWORK</span>
-    </div>
-
-    <div class="mode">offering</div>
+<div class="page" id="page">
+  <div class="title">
+    <span>PARSONS SURVIVAL</span><br>
+    <span>NETWORK</span>
   </div>
 
-  <script>
-    const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=20";
+  <div class="mode">offering</div>
+</div>
 
-    async function loadBubbles() {
-      const res = await fetch(arenaData);
-      const data = await res.json();
-      const items = data.data;
+<script>
+const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=20";
 
-      const page = document.getElementById("page");
-      let placed = [];
+async function loadBubbles() {
+  const res = await fetch(arenaData);
+  const data = await res.json();
+  const items = data.data;
 
-      items.forEach(block => {
-        let imageURL =
-          block.image?.display?.url ||
-          block.image?.original?.url ||
-          block.image?.thumb?.url ||
-          block.image?.src;
+  const page = document.getElementById("page");
+  let placed = [];
 
-        if (!imageURL) return;
+  let sizes = [
+    { w: 100, h: 70 },
+    { w: 190, h: 130 },
+    { w: 330, h: 220 }
+  ];
 
-        let sizes = [
-          { w: 140, h: 100 },
-          { w: 320, h: 230 },
-          { w: 500, h: 360 }
-        ];
+  items.forEach((block, i) => {
+    let imageURL =
+      block.image?.display?.url ||
+      block.image?.original?.url ||
+      block.image?.thumb?.url ||
+      block.image?.src;
 
-        let base = sizes[Math.floor(Math.random() * 3)];
+    if (!imageURL) return;
 
-        let w = base.w + (Math.random() * 40 - 20);
-        let h = base.h + (Math.random() * 30 - 15);
+    let base = sizes[Math.floor(Math.random() * 3)];
+    let w = base.w;
+    let h = base.h;
 
-        let x, y, ok;
-        let tries = 0;
+    let x, y, ok;
+    let tries = 0;
 
-        do {
-          ok = true;
+    do {
+      ok = true;
 
-          x = Math.random() * (window.innerWidth - w);
-          y = Math.random() * (window.innerHeight - h);
+      x = Math.random() * window.innerWidth * 0.7 + window.innerWidth * 0.15;
+      y = Math.random() * window.innerHeight * 0.6 + window.innerHeight * 0.2;
 
-          for (let i = 0; i < placed.length; i++) {
-            let b = placed[i];
+      if (i === 0) {
+        w = 360;
+        h = 240;
+        x = window.innerWidth / 2 - w / 2;
+        y = window.innerHeight / 2 - h / 2;
+      }
 
-            let overlap =
-              x < b.x + b.w + 20 &&
-              x + w + 20 > b.x &&
-              y < b.y + b.h + 20 &&
-              y + h + 20 > b.y;
+      for (let j = 0; j < placed.length; j++) {
+        let b = placed[j];
 
-            if (overlap) {
-              ok = false;
-              break;
-            }
-          }
+        let overlap =
+          x < b.x + b.w &&
+          x + w > b.x &&
+          y < b.y + b.h &&
+          y + h > b.y;
 
-          tries++;
-          if (tries > 100) return;
+        if (overlap) {
+          ok = false;
+          break;
+        }
+      }
 
-        } while (!ok);
+      tries++;
+      if (tries > 100) return;
 
-        let bubble = document.createElement("div");
-        bubble.className = "bubble";
-        bubble.style.width = w + "px";
-        bubble.style.height = h + "px";
-        bubble.style.left = x + "px";
-        bubble.style.top = y + "px";
+    } while (!ok);
 
-        let photo = document.createElement("div");
-        photo.className = "photo";
+    let bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.style.width = w + "px";
+    bubble.style.height = h + "px";
+    bubble.style.left = x + "px";
+    bubble.style.top = y + "px";
 
-        let img = document.createElement("img");
-        img.src = imageURL;
+    let photo = document.createElement("div");
+    photo.className = "photo";
 
-        let info = document.createElement("div");
-        info.className = "info";
-        info.innerText = "title / urgency level";
+    let img = document.createElement("img");
+    img.src = imageURL;
 
-        photo.appendChild(img);
-        bubble.appendChild(photo);
-        bubble.appendChild(info);
-        page.appendChild(bubble);
+    let info = document.createElement("div");
+    info.className = "info";
+    info.innerText = "title / urgency level";
 
-        placed.push({ x: x, y: y, w: w, h: h });
-      });
-    }
+    photo.appendChild(img);
+    bubble.appendChild(photo);
+    bubble.appendChild(info);
+    page.appendChild(bubble);
 
-    loadBubbles();
-  </script>
+    placed.push({ x: x, y: y, w: w, h: h });
+  });
+}
+
+loadBubbles();
+</script>
 
 </body>
 </html>
