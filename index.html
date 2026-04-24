@@ -50,9 +50,9 @@
       height: 58%;
       left: 15%;
       top: 12%;
-      background: #aaa;
       border-radius: 50%;
       overflow: hidden;
+      background: #aaa;
     }
 
     .photo img {
@@ -70,20 +70,9 @@
       transform: rotate(22deg);
     }
 
-    .small {
-      width: 90px;
-      height: 60px;
-    }
-
-    .medium {
-      width: 180px;
-      height: 130px;
-    }
-
-    .large {
-      width: 320px;
-      height: 240px;
-    }
+    .small { width: 90px; height: 60px; }
+    .medium { width: 180px; height: 130px; }
+    .large { width: 320px; height: 240px; }
   </style>
 </head>
 
@@ -94,7 +83,6 @@
     <span>PARSONS SURVIVAL</span><br>
     <span>NETWORK</span>
   </div>
-
   <div class="mode">offering</div>
 </div>
 
@@ -116,17 +104,34 @@ let layout = [
   { x: 355, y: 742, size: "large" }
 ];
 
-async function loadBubbles() {
+function getSize(size){
+  if(size==="small") return {w:90,h:60};
+  if(size==="medium") return {w:180,h:130};
+  return {w:320,h:240};
+}
+
+async function loadBubbles(){
   const res = await fetch(arenaData);
   const data = await res.json();
   const items = data.data;
 
   const page = document.getElementById("page");
-  let shiftX = -120;
 
-  layout.forEach((spot, i) => {
+  let minX = Infinity;
+  let maxX = -Infinity;
+
+  layout.forEach(l=>{
+    let s = getSize(l.size);
+    minX = Math.min(minX, l.x);
+    maxX = Math.max(maxX, l.x + s.w);
+  });
+
+  let layoutWidth = maxX - minX;
+  let shiftX = (page.clientWidth - layoutWidth)/2 - minX;
+
+  layout.forEach((spot,i)=>{
     let block = items[i];
-    if (!block) return;
+    if(!block) return;
 
     let imageURL =
       block.image?.display?.url ||
@@ -139,11 +144,11 @@ async function loadBubbles() {
     bubble.style.left = (spot.x + shiftX) + "px";
     bubble.style.top = spot.y + "px";
 
-    if (spot.size !== "small") {
+    if(spot.size !== "small"){
       let photo = document.createElement("div");
       photo.className = "photo";
 
-      if (imageURL) {
+      if(imageURL){
         let img = document.createElement("img");
         img.src = imageURL;
         photo.appendChild(img);
