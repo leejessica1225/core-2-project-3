@@ -19,13 +19,12 @@
       font-size: 26px;
       line-height: 1.4;
       z-index: 10;
+      cursor: pointer;
     }
 
-    /* 🔥 깔끔한 double underline */
     .title span {
       display: inline-block;
       position: relative;
-
       text-decoration: underline;
       text-decoration-thickness: 2px;
       text-underline-offset: 4px;
@@ -35,10 +34,60 @@
       content: "";
       position: absolute;
       left: 0;
-      bottom: -6px;   /* 🔥 두 줄 간격 */
+      bottom: -6px;
       width: 100%;
       height: 2px;
       background: black;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -370px;
+      width: 370px;
+      height: 100vh;
+      background: black;
+      color: white;
+      padding: 35px 30px;
+      box-sizing: border-box;
+      z-index: 50;
+      transition: left 0.3s ease;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .menu-title {
+      font-size: 26px;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+
+    .menu-title span {
+      display: inline-block;
+      position: relative;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    .menu-title span::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 100%;
+      height: 2px;
+      background: white;
+    }
+
+    .menu-item {
+      margin-top: 80px;
+      font-size: 26px;
+      color: white;
+      text-decoration: none;
+      display: block;
     }
 
     .mode {
@@ -108,9 +157,18 @@
 
 <body>
 
-<div class="title">
+<div class="title" onclick="toggleMenu()">
   <span>PARSONS SURVIVAL</span><br>
   <span>NETWORK</span>
+</div>
+
+<div class="sidebar" id="sidebar">
+  <div class="menu-title" onclick="toggleMenu()">
+    <span>PARSONS SURVIVAL</span><br>
+    <span>NETWORK</span>
+  </div>
+
+  <a href="create.html" class="menu-item">create a post</a>
 </div>
 
 <a href="index2.html" class="mode">offering</a>
@@ -137,6 +195,11 @@ let scale = 1;
 
 const page = document.getElementById("page");
 const win = document.getElementById("window");
+
+function toggleMenu() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.classList.toggle("open");
+}
 
 function applyTransform() {
   page.style.transform =
