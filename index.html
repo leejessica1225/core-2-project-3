@@ -47,7 +47,7 @@
       position: absolute;
       width: 8000px;
       height: 6000px;
-      transform-origin: 0 0;
+      transform-origin: 50vw 50vh;
     }
 
     .bubble {
@@ -98,7 +98,7 @@
 </div>
 
 <script>
-const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=100";
+const arenaData = "https://api.are.na/v2/channels/publication-btmpbivan1o/contents?per=50";
 
 let items = [];
 let placed = [];
@@ -124,7 +124,7 @@ async function loadData() {
   try {
     const res = await fetch(arenaData);
     const data = await res.json();
-    items = data.data;
+    items = data.contents;
   } catch {
     items = [];
   }
@@ -135,6 +135,18 @@ async function loadData() {
 }
 
 function makeBubble() {
+  if (items.length === 0) return;
+
+  let block = items[Math.floor(Math.random() * items.length)];
+
+  let imageURL =
+    block.image?.display?.url ||
+    block.image?.large?.url ||
+    block.image?.original?.url ||
+    block.image?.thumb?.url;
+
+  if (!imageURL) return;
+
   let size = sizes[Math.floor(Math.random() * sizes.length)];
   let w = size.w;
   let h = size.h;
@@ -144,8 +156,11 @@ function makeBubble() {
   let ok = false;
 
   for (let tries = 0; tries < 300; tries++) {
-    x = 2000 + Math.random() * 3000;
-    y = 1500 + Math.random() * 2000;
+    let centerX = -moveX + window.innerWidth / 2;
+    let centerY = -moveY + window.innerHeight / 2;
+
+    x = centerX - 1000 + Math.random() * 2000;
+    y = centerY - 700 + Math.random() * 1400;
 
     ok = true;
 
@@ -179,25 +194,14 @@ function makeBubble() {
   let photo = document.createElement("div");
   photo.className = "photo";
 
-  if (items.length > 0) {
-    let block = items[Math.floor(Math.random() * items.length)];
-
-    let imageURL =
-      block?.image?.display?.url ||
-      block?.image?.original?.url ||
-      block?.image?.thumb?.url;
-
-    if (imageURL) {
-      let img = document.createElement("img");
-      img.src = imageURL;
-      photo.appendChild(img);
-    }
-  }
+  let img = document.createElement("img");
+  img.src = imageURL;
 
   let info = document.createElement("div");
   info.className = "info";
   info.innerText = "title / urgency level";
 
+  photo.appendChild(img);
   bubble.appendChild(photo);
   bubble.appendChild(info);
   page.appendChild(bubble);
@@ -220,6 +224,7 @@ win.addEventListener("wheel", function(event) {
     moveX -= event.deltaX;
     moveY -= event.deltaY;
 
+    makeBubble();
     makeBubble();
     makeBubble();
   }
