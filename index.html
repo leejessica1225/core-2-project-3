@@ -9,7 +9,8 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      overscroll-behavior: none;
+      overscroll-behavior-x: none;
+      overscroll-behavior-y: none;
     }
 
     body {
@@ -22,7 +23,6 @@
       height: 100vh;
       overflow: hidden;
       border: 2px solid black;
-      box-sizing: border-box;
       position: relative;
     }
 
@@ -115,27 +115,15 @@ async function loadBubbles() {
 
   const page = document.getElementById("page");
 
-  let positions = [
-    { x: 750, y: 450, w: 330, h: 220 },
-    { x: 1130, y: 390, w: 190, h: 130 },
-    { x: 1430, y: 360, w: 330, h: 220 },
+  let placed = [];
 
-    { x: 650, y: 700, w: 190, h: 130 },
-    { x: 940, y: 610, w: 330, h: 220 },
-    { x: 1340, y: 620, w: 190, h: 130 },
-    { x: 1560, y: 610, w: 330, h: 220 },
-
-    { x: 800, y: 950, w: 190, h: 130 },
-    { x: 1180, y: 920, w: 330, h: 220 },
-    { x: 1590, y: 970, w: 190, h: 130 },
-
-    { x: 1900, y: 840, w: 330, h: 220 },
-    { x: 550, y: 1080, w: 330, h: 220 }
+  let sizes = [
+    { w: 100, h: 70 },
+    { w: 190, h: 130 },
+    { w: 330, h: 220 }
   ];
 
-  positions.forEach((pos, i) => {
-    let block = items[i];
-
+  items.forEach((block, i) => {
     let imageURL =
       block?.image?.display?.url ||
       block?.image?.original?.url ||
@@ -144,12 +132,46 @@ async function loadBubbles() {
 
     if (!imageURL) return;
 
+    let base = sizes[Math.floor(Math.random() * 3)];
+    let w = base.w;
+    let h = base.h;
+
+    let x, y, ok;
+    let tries = 0;
+
+    do {
+      ok = true;
+
+      x = Math.random() * (3000 - w);
+      y = Math.random() * (2000 - h);
+
+      for (let j = 0; j < placed.length; j++) {
+        let b = placed[j];
+        let gap = 30;
+
+        let overlap =
+          x < b.x + b.w + gap &&
+          x + w + gap > b.x &&
+          y < b.y + b.h + gap &&
+          y + h + gap > b.y;
+
+        if (overlap) {
+          ok = false;
+          break;
+        }
+      }
+
+      tries++;
+      if (tries > 100) return;
+
+    } while (!ok);
+
     let bubble = document.createElement("div");
     bubble.className = "bubble";
-    bubble.style.width = pos.w + "px";
-    bubble.style.height = pos.h + "px";
-    bubble.style.left = pos.x + "px";
-    bubble.style.top = pos.y + "px";
+    bubble.style.width = w + "px";
+    bubble.style.height = h + "px";
+    bubble.style.left = x + "px";
+    bubble.style.top = y + "px";
 
     let photo = document.createElement("div");
     photo.className = "photo";
@@ -165,6 +187,8 @@ async function loadBubbles() {
     bubble.appendChild(photo);
     bubble.appendChild(info);
     page.appendChild(bubble);
+
+    placed.push({ x: x, y: y, w: w, h: h });
   });
 }
 
@@ -181,11 +205,23 @@ page.style.transform = "translate(" + moveX + "px, " + moveY + "px)";
 win.addEventListener("wheel", function(event) {
   event.preventDefault();
 
-  moveX = moveX - event.deltaX;
-  moveY = moveY - event.deltaY;
+  moveX -= event.deltaX;
+  moveY -= event.deltaY;
 
   page.style.transform = "translate(" + moveX + "px, " + moveY + "px)";
 }, { passive: false });
+
+window.addEventListener("gesturestart", function(event) {
+  event.preventDefault();
+});
+
+window.addEventListener("gesturechange", function(event) {
+  event.preventDefault();
+});
+
+window.addEventListener("gestureend", function(event) {
+  event.preventDefault();
+});
 </script>
 
 </body>
