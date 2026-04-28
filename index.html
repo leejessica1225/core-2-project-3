@@ -6,12 +6,8 @@
   <style>
     html, body {
       margin: 0;
-      width: 100%;
       height: 100%;
       overflow: hidden;
-    }
-
-    body {
       background: white;
       font-family: Arial;
     }
@@ -26,32 +22,9 @@
 
     .page {
       position: absolute;
-      width: 6000px;
-      height: 4000px;
-      background: white;
-    }
-
-    .title {
-      position: fixed;
-      top: 30px;
-      left: 30px;
-      font-size: 26px;
-      line-height: 1.2;
-      z-index: 10;
-    }
-
-    .title span {
-      border-bottom: 4px solid black;
-    }
-
-    .mode {
-      position: fixed;
-      top: 45px;
-      right: 95px;
-      font-size: 26px;
-      text-decoration: none;
-      color: black;
-      z-index: 10;
+      width: 8000px;
+      height: 6000px;
+      transform-origin: 0 0;
     }
 
     .bubble {
@@ -68,7 +41,6 @@
       top: 10%;
       border-radius: 50%;
       overflow: hidden;
-      background: #aaa;
     }
 
     .photo img {
@@ -76,26 +48,10 @@
       height: 100%;
       object-fit: cover;
     }
-
-    .info {
-      position: absolute;
-      width: 100%;
-      bottom: 14%;
-      text-align: center;
-      font-size: 15px;
-      transform: rotate(15deg);
-    }
   </style>
 </head>
 
 <body>
-
-<div class="title">
-  <span>PARSONS SURVIVAL</span><br>
-  <span>NETWORK</span>
-</div>
-
-<a href="index2.html" class="mode">offering</a>
 
 <div class="window" id="window">
   <div class="page" id="page"></div>
@@ -104,108 +60,123 @@
 <script>
 const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=100";
 
-async function loadBubbles() {
-  const res = await fetch(arenaData);
-  const data = await res.json();
-  const items = data.data;
+let items = [];
+let placed = [];
 
-  const page = document.getElementById("page");
-
-  let placed = [];
-
-  let sizes = [
-    { w: 160, h: 120 },
-    { w: 300, h: 220 },
-    { w: 480, h: 340 }
-  ];
-
-  items.forEach(function(block) {
-    let imageURL =
-      block?.image?.display?.url ||
-      block?.image?.original?.url ||
-      block?.image?.thumb?.url ||
-      block?.image?.src;
-
-    if (!imageURL) return;
-
-    let size = sizes[Math.floor(Math.random() * sizes.length)];
-    let w = size.w;
-    let h = size.h;
-
-    let x;
-    let y;
-    let goodSpot = false;
-
-    for (let tries = 0; tries < 700; tries++) {
-      x = 1200 + Math.random() * (3600 - w);
-      y = 800 + Math.random() * (2400 - h);
-
-      goodSpot = true;
-
-      for (let i = 0; i < placed.length; i++) {
-        let b = placed[i];
-        let gap = 20;
-
-        if (
-          x < b.x + b.w + gap &&
-          x + w + gap > b.x &&
-          y < b.y + b.h + gap &&
-          y + h + gap > b.y
-        ) {
-          goodSpot = false;
-          break;
-        }
-      }
-
-      if (goodSpot) break;
-    }
-
-    if (!goodSpot) return;
-
-    let bubble = document.createElement("div");
-    bubble.className = "bubble";
-    bubble.style.width = w + "px";
-    bubble.style.height = h + "px";
-    bubble.style.left = x + "px";
-    bubble.style.top = y + "px";
-
-    let photo = document.createElement("div");
-    photo.className = "photo";
-
-    let img = document.createElement("img");
-    img.src = imageURL;
-
-    let info = document.createElement("div");
-    info.className = "info";
-    info.innerText = "title / urgency level";
-
-    photo.appendChild(img);
-    bubble.appendChild(photo);
-    bubble.appendChild(info);
-    page.appendChild(bubble);
-
-    placed.push({ x: x, y: y, w: w, h: h });
-  });
-}
-
-loadBubbles();
+let sizes = [
+  { w: 160, h: 120 },
+  { w: 300, h: 220 },
+  { w: 480, h: 340 }
+];
 
 let moveX = -2000;
 let moveY = -1200;
+let scale = 1;
 
 const page = document.getElementById("page");
 const win = document.getElementById("window");
 
-page.style.transform = "translate(" + moveX + "px, " + moveY + "px)";
+function applyTransform() {
+  page.style.transform =
+    "translate(" + moveX + "px," + moveY + "px) scale(" + scale + ")";
+}
 
-win.addEventListener("wheel", function(event) {
-  event.preventDefault();
+async function loadData() {
+  const res = await fetch(arenaData);
+  const data = await res.json();
+  items = data.data;
 
-  moveX -= event.deltaX;
-  moveY -= event.deltaY;
+  for (let i = 0; i < 20; i++) {
+    makeBubble();
+  }
+}
 
-  page.style.transform = "translate(" + moveX + "px, " + moveY + "px)";
+function makeBubble() {
+  if (items.length === 0) return;
+
+  let block = items[Math.floor(Math.random() * items.length)];
+
+  let imageURL =
+    block?.image?.display?.url ||
+    block?.image?.original?.url ||
+    block?.image?.thumb?.url;
+
+  if (!imageURL) return;
+
+  let size = sizes[Math.floor(Math.random() * sizes.length)];
+  let w = size.w;
+  let h = size.h;
+
+  let x, y, ok;
+
+  for (let tries = 0; tries < 200; tries++) {
+    x = 2000 + Math.random() * 3000;
+    y = 1500 + Math.random() * 2000;
+
+    ok = true;
+
+    for (let i = 0; i < placed.length; i++) {
+      let b = placed[i];
+      let gap = 20;
+
+      if (
+        x < b.x + b.w + gap &&
+        x + w + gap > b.x &&
+        y < b.y + b.h + gap &&
+        y + h + gap > b.y
+      ) {
+        ok = false;
+        break;
+      }
+    }
+
+    if (ok) break;
+  }
+
+  if (!ok) return;
+
+  let bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.style.width = w + "px";
+  bubble.style.height = h + "px";
+  bubble.style.left = x + "px";
+  bubble.style.top = y + "px";
+
+  let photo = document.createElement("div");
+  photo.className = "photo";
+
+  let img = document.createElement("img");
+  img.src = imageURL;
+
+  photo.appendChild(img);
+  bubble.appendChild(photo);
+  page.appendChild(bubble);
+
+  placed.push({ x, y, w, h });
+}
+
+applyTransform();
+
+win.addEventListener("wheel", function(e) {
+  e.preventDefault();
+
+  if (e.ctrlKey) {
+    scale += e.deltaY * -0.001;
+    if (scale < 0.5) scale = 0.5;
+    if (scale > 2) scale = 2;
+  } else {
+    moveX -= e.deltaX;
+    moveY -= e.deltaY;
+
+    for (let i = 0; i < 2; i++) {
+      makeBubble();
+    }
+  }
+
+  applyTransform();
 }, { passive: false });
+
+loadData();
 </script>
 
 </body>
