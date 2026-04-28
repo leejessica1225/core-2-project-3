@@ -26,8 +26,8 @@
 
     .page {
       position: absolute;
-      width: 3000px;
-      height: 2000px;
+      width: 6000px;
+      height: 4000px;
       background: white;
     }
 
@@ -102,7 +102,7 @@
 </div>
 
 <script>
-const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=60";
+const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=100";
 
 async function loadBubbles() {
   const res = await fetch(arenaData);
@@ -114,9 +114,9 @@ async function loadBubbles() {
   let placed = [];
 
   let sizes = [
-    { w: 120, h: 90 },
-    { w: 220, h: 160 },
-    { w: 420, h: 300 }
+    { w: 160, h: 120 },
+    { w: 300, h: 220 },
+    { w: 480, h: 340 }
   ];
 
   items.forEach(function(block) {
@@ -136,9 +136,9 @@ async function loadBubbles() {
     let y;
     let goodSpot = false;
 
-    for (let tries = 0; tries < 500; tries++) {
-      x = 600 + Math.random() * (1800 - w);
-      y = 300 + Math.random() * (1200 - h);
+    for (let tries = 0; tries < 700; tries++) {
+      x = 1200 + Math.random() * (3600 - w);
+      y = 800 + Math.random() * (2400 - h);
 
       goodSpot = true;
 
@@ -190,8 +190,8 @@ async function loadBubbles() {
 
 loadBubbles();
 
-let moveX = -600;
-let moveY = -350;
+let moveX = -2000;
+let moveY = -1200;
 
 const page = document.getElementById("page");
 const win = document.getElementById("window");
