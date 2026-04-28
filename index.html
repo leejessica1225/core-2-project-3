@@ -22,7 +22,6 @@
       cursor: pointer;
     }
 
-    /* double underline */
     .title span {
       display: inline-block;
       position: relative;
@@ -41,12 +40,11 @@
       background: black;
     }
 
-    /* 🔥 offering 정렬 + 크기 */
     .mode {
       position: fixed;
-      top: 30px;        /* title이랑 맞춤 */
+      top: 30px;
       right: 30px;
-      font-size: 18px;  /* 작게 */
+      font-size: 18px;
       text-decoration: none;
       color: black;
       z-index: 10;
@@ -63,16 +61,13 @@
       padding: 35px 30px;
       box-sizing: border-box;
       z-index: 50;
-      transition: left 0.3s ease;
-    }
-
-    .sidebar.open {
-      left: 0;
+      transition: left 0.3s;
     }
 
     .menu-title {
       font-size: 26px;
       line-height: 1.4;
+      cursor: pointer;
     }
 
     .menu-title span {
@@ -95,7 +90,7 @@
 
     .menu-item {
       margin-top: 80px;
-      font-size: 18px;  /* 🔥 create a post 작게 */
+      font-size: 18px;
       color: white;
       text-decoration: none;
       display: block;
@@ -156,15 +151,15 @@
   </style>
 </head>
 
-<body>
+<body onclick="closeMenu()">
 
-<div class="title" onclick="toggleMenu()">
+<div class="title" onclick="toggleMenu(event)">
   <span>PARSONS SURVIVAL</span><br>
   <span>NETWORK</span>
 </div>
 
-<div class="sidebar" id="sidebar">
-  <div class="menu-title">
+<div class="sidebar" id="sidebar" onclick="event.stopPropagation()">
+  <div class="menu-title" onclick="toggleMenu(event)">
     <span>PARSONS SURVIVAL</span><br>
     <span>NETWORK</span>
   </div>
@@ -179,6 +174,23 @@
 </div>
 
 <script>
+function toggleMenu(event) {
+  event.stopPropagation();
+
+  var sidebar = document.getElementById("sidebar");
+
+  if (sidebar.style.left === "0px") {
+    sidebar.style.left = "-370px";
+  } else {
+    sidebar.style.left = "0px";
+  }
+}
+
+function closeMenu() {
+  var sidebar = document.getElementById("sidebar");
+  sidebar.style.left = "-370px";
+}
+
 const arenaData = "https://api.are.na/v2/channels/publication-btmpbivan1o/contents?per=50";
 
 let items = [];
@@ -196,11 +208,6 @@ let scale = 1;
 
 const page = document.getElementById("page");
 const win = document.getElementById("window");
-
-function toggleMenu() {
-  const sidebar = document.getElementById("sidebar");
-  sidebar.classList.toggle("open");
-}
 
 function applyTransform() {
   page.style.transform =
