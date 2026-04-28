@@ -44,7 +44,7 @@
       position: fixed;
       top: 30px;
       right: 30px;
-      font-size: 22px;
+      font-size: 18px;
       text-decoration: none;
       color: black;
       z-index: 10;
@@ -72,20 +72,7 @@
 
     .menu-title span {
       display: inline-block;
-      position: relative;
       text-decoration: underline;
-      text-decoration-thickness: 2px;
-      text-underline-offset: 4px;
-    }
-
-    .menu-title span::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -6px;
-      width: 100%;
-      height: 2px;
-      background: white;
     }
 
     .menu-item {
@@ -109,14 +96,14 @@
       width: 12000px;
       height: 9000px;
       transform-origin: 0 0;
-      transition: transform 0.12s ease-out;
+      transition: transform 0.08s ease-out;
     }
 
     .bubble {
       position: absolute;
       background: #d3d3d3;
       border-radius: 50%;
-      transition: background 0.2s ease;
+      transition: background 0.2s;
     }
 
     .bubble:hover {
@@ -142,11 +129,21 @@
 
     .info {
       position: absolute;
-      width: 100%;
-      bottom: 14%;
-      text-align: center;
-      font-size: 15px;
-      transform: rotate(15deg);
+      bottom: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    .left {
+      display: inline-block;
+      transform: rotate(-12deg);
+    }
+
+    .right {
+      display: inline-block;
+      transform: rotate(-28deg);
+      margin-left: 6px;
     }
   </style>
 </head>
@@ -176,7 +173,6 @@
 <script>
 function toggleMenu(event) {
   event.stopPropagation();
-
   var sidebar = document.getElementById("sidebar");
 
   if (sidebar.style.left === "0px") {
@@ -187,8 +183,7 @@ function toggleMenu(event) {
 }
 
 function closeMenu() {
-  var sidebar = document.getElementById("sidebar");
-  sidebar.style.left = "-370px";
+  document.getElementById("sidebar").style.left = "-370px";
 }
 
 const arenaData = "https://api.are.na/v2/channels/publication-btmpbivan1o/contents?per=50";
@@ -305,7 +300,15 @@ function makeBubble(directionX, directionY) {
 
   let info = document.createElement("div");
   info.className = "info";
-  info.innerText = "title / urgency level";
+
+  if (w === 160) info.style.fontSize = "12px";
+  else if (w === 300) info.style.fontSize = "20px";
+  else info.style.fontSize = "34px";
+
+  info.innerHTML = `
+    <span class="left">title /</span>
+    <span class="right">urgent level</span>
+  `;
 
   photo.appendChild(img);
   bubble.appendChild(photo);
@@ -324,7 +327,7 @@ win.addEventListener("wheel", function(event) {
   if (event.ctrlKey) {
     let oldScale = scale;
 
-    scale += event.deltaY * -0.003;
+    scale += event.deltaY * -0.002;
 
     if (scale < 0.5) scale = 0.5;
     if (scale > 2) scale = 2;
