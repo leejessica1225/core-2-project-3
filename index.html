@@ -48,6 +48,7 @@
       width: 8000px;
       height: 6000px;
       transform-origin: 50vw 50vh;
+      transition: transform 0.15s ease-out;
     }
 
     .bubble {
@@ -129,7 +130,7 @@ async function loadData() {
     items = [];
   }
 
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 15; i++) {
     makeBubble();
   }
 }
@@ -159,14 +160,14 @@ function makeBubble() {
     let centerX = -moveX + window.innerWidth / 2;
     let centerY = -moveY + window.innerHeight / 2;
 
-    x = centerX - 1000 + Math.random() * 2000;
-    y = centerY - 700 + Math.random() * 1400;
+    x = centerX - 1200 + Math.random() * 2400;
+    y = centerY - 850 + Math.random() * 1700;
 
     ok = true;
 
     for (let i = 0; i < placed.length; i++) {
       let b = placed[i];
-      let gap = 20;
+      let gap = 50;
 
       if (
         x < b.x + b.w + gap &&
@@ -216,7 +217,7 @@ win.addEventListener("wheel", function(event) {
   event.preventDefault();
 
   if (event.ctrlKey) {
-    scale += event.deltaY * -0.001;
+    scale += event.deltaY * -0.0005;
 
     if (scale < 0.5) scale = 0.5;
     if (scale > 2) scale = 2;
@@ -224,9 +225,9 @@ win.addEventListener("wheel", function(event) {
     moveX -= event.deltaX;
     moveY -= event.deltaY;
 
-    makeBubble();
-    makeBubble();
-    makeBubble();
+    if (Math.random() < 0.25) {
+      makeBubble();
+    }
   }
 
   applyTransform();
