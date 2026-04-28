@@ -9,8 +9,6 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      overscroll-behavior-x: none;
-      overscroll-behavior-y: none;
     }
 
     body {
@@ -106,7 +104,7 @@
 </div>
 
 <script>
-const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=20";
+const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=80";
 
 async function loadBubbles() {
   const res = await fetch(arenaData);
@@ -115,15 +113,13 @@ async function loadBubbles() {
 
   const page = document.getElementById("page");
 
-  let placed = [];
-
   let sizes = [
-    { w: 100, h: 70 },
-    { w: 190, h: 130 },
-    { w: 330, h: 220 }
+    { w: 70, h: 50 },
+    { w: 140, h: 100 },
+    { w: 280, h: 200 }
   ];
 
-  items.forEach((block, i) => {
+  items.forEach((block) => {
     let imageURL =
       block?.image?.display?.url ||
       block?.image?.original?.url ||
@@ -132,39 +128,22 @@ async function loadBubbles() {
 
     if (!imageURL) return;
 
-    let base = sizes[Math.floor(Math.random() * 3)];
+    let r = Math.random();
+    let base;
+
+    if (r < 0.6) {
+      base = sizes[0];
+    } else if (r < 0.9) {
+      base = sizes[1];
+    } else {
+      base = sizes[2];
+    }
+
     let w = base.w;
     let h = base.h;
 
-    let x, y, ok;
-    let tries = 0;
-
-    do {
-      ok = true;
-
-      x = Math.random() * (3000 - w);
-      y = Math.random() * (2000 - h);
-
-      for (let j = 0; j < placed.length; j++) {
-        let b = placed[j];
-        let gap = 30;
-
-        let overlap =
-          x < b.x + b.w + gap &&
-          x + w + gap > b.x &&
-          y < b.y + b.h + gap &&
-          y + h + gap > b.y;
-
-        if (overlap) {
-          ok = false;
-          break;
-        }
-      }
-
-      tries++;
-      if (tries > 100) return;
-
-    } while (!ok);
+    let x = Math.random() * (3000 - w);
+    let y = Math.random() * (2000 - h);
 
     let bubble = document.createElement("div");
     bubble.className = "bubble";
@@ -187,8 +166,6 @@ async function loadBubbles() {
     bubble.appendChild(photo);
     bubble.appendChild(info);
     page.appendChild(bubble);
-
-    placed.push({ x: x, y: y, w: w, h: h });
   });
 }
 
@@ -210,18 +187,6 @@ win.addEventListener("wheel", function(event) {
 
   page.style.transform = "translate(" + moveX + "px, " + moveY + "px)";
 }, { passive: false });
-
-window.addEventListener("gesturestart", function(event) {
-  event.preventDefault();
-});
-
-window.addEventListener("gesturechange", function(event) {
-  event.preventDefault();
-});
-
-window.addEventListener("gestureend", function(event) {
-  event.preventDefault();
-});
 </script>
 
 </body>
