@@ -1,24 +1,42 @@
 <!DOCTYPE html>
 <html>
-<head> 
+<head>
   <title>Parsons Survival Network</title>
 
   <style>
-    body {
+    html, body {
       margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
       background: white;
       font-family: Arial;
     }
 
-    .page {
-      position: relative;
+    .window {
+      width: 100vw;
       height: 100vh;
       overflow: hidden;
       border: 2px solid black;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .page {
+      position: absolute;
+      width: 3000px;
+      height: 2000px;
+      background: white;
+      left: 0;
+      top: 0;
     }
 
     .title {
-      position: absolute;
+      position: fixed;
       top: 30px;
       left: 30px;
       font-size: 26px;
@@ -31,7 +49,7 @@
     }
 
     .mode {
-      position: absolute;
+      position: fixed;
       top: 45px;
       right: 95px;
       font-size: 26px;
@@ -76,13 +94,15 @@
 
 <body>
 
-<div class="page" id="page">
-  <div class="title">
-    <span>PARSONS SURVIVAL</span><br>
-    <span>NETWORK</span>
-  </div>
+<div class="title">
+  <span>PARSONS SURVIVAL</span><br>
+  <span>NETWORK</span>
+</div>
 
-  <a href="index2.html" class="mode">offering</a>
+<a href="index2.html" class="mode">offering</a>
+
+<div class="window" id="window">
+  <div class="page" id="page"></div>
 </div>
 
 <script>
@@ -94,70 +114,42 @@ async function loadBubbles() {
   const items = data.data;
 
   const page = document.getElementById("page");
-  let placed = [];
 
-  let sizes = [
-    { w: 100, h: 70 },
-    { w: 190, h: 130 },
-    { w: 330, h: 220 }
+  let positions = [
+    { x: 750, y: 450, w: 330, h: 220 },
+    { x: 1130, y: 390, w: 190, h: 130 },
+    { x: 1430, y: 360, w: 330, h: 220 },
+
+    { x: 650, y: 700, w: 190, h: 130 },
+    { x: 940, y: 610, w: 330, h: 220 },
+    { x: 1340, y: 620, w: 190, h: 130 },
+    { x: 1560, y: 610, w: 330, h: 220 },
+
+    { x: 800, y: 950, w: 190, h: 130 },
+    { x: 1180, y: 920, w: 330, h: 220 },
+    { x: 1590, y: 970, w: 190, h: 130 },
+
+    { x: 1900, y: 840, w: 330, h: 220 },
+    { x: 550, y: 1080, w: 330, h: 220 }
   ];
 
-  items.forEach((block, i) => {
+  positions.forEach((pos, i) => {
+    let block = items[i];
+
     let imageURL =
-      block.image?.display?.url ||
-      block.image?.original?.url ||
-      block.image?.thumb?.url ||
-      block.image?.src;
+      block?.image?.display?.url ||
+      block?.image?.original?.url ||
+      block?.image?.thumb?.url ||
+      block?.image?.src;
 
     if (!imageURL) return;
 
-    let base = sizes[Math.floor(Math.random() * 3)];
-    let w = base.w;
-    let h = base.h;
-
-    let x, y, ok;
-    let tries = 0;
-
-    do {
-      ok = true;
-
-      x = 40 + Math.random() * (page.clientWidth - w - 80);
-      y = 120 + Math.random() * (page.clientHeight - h - 180);
-
-      if (i === 0) {
-        w = 330;
-        h = 220;
-        x = page.clientWidth / 2 - w / 2;
-        y = page.clientHeight / 2 - h / 2;
-      }
-
-      for (let j = 0; j < placed.length; j++) {
-        let b = placed[j];
-        let gap = 35;
-
-        let overlap =
-          x < b.x + b.w + gap &&
-          x + w + gap > b.x &&
-          y < b.y + b.h + gap &&
-          y + h + gap > b.y;
-
-        if (overlap) {
-          ok = false;
-          break;
-        }
-      }
-
-      tries++;
-      if (tries > 100) return;
-
-    } while (!ok);
-
     let bubble = document.createElement("div");
     bubble.className = "bubble";
-    bubble.style.width = w + "px";
-    bubble.style.height = h + "px";
-    bubble.style.left = x + "px";
-    bubble.style.top = y + "px";
+    bubble.style.width = pos.w + "px";
+    bubble.style.height = pos.h + "px";
+    bubble.style.left = pos.x + "px";
+    bubble.style.top = pos.y + "px";
 
     let photo = document.createElement("div");
     photo.className = "photo";
@@ -173,12 +165,27 @@ async function loadBubbles() {
     bubble.appendChild(photo);
     bubble.appendChild(info);
     page.appendChild(bubble);
-
-    placed.push({ x: x, y: y, w: w, h: h });
   });
 }
 
 loadBubbles();
+
+let moveX = -600;
+let moveY = -350;
+
+const page = document.getElementById("page");
+const win = document.getElementById("window");
+
+page.style.transform = "translate(" + moveX + "px, " + moveY + "px)";
+
+win.addEventListener("wheel", function(event) {
+  event.preventDefault();
+
+  moveX = moveX - event.deltaX;
+  moveY = moveY - event.deltaY;
+
+  page.style.transform = "translate(" + moveX + "px, " + moveY + "px)";
+}, { passive: false });
 </script>
 
 </body>
