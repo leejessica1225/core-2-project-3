@@ -45,10 +45,10 @@
 
     .page {
       position: absolute;
-      width: 8000px;
-      height: 6000px;
+      width: 12000px;
+      height: 9000px;
       transform-origin: 50vw 50vh;
-      transition: transform 0.15s ease-out;
+      transition: transform 0.12s ease-out;
     }
 
     .bubble {
@@ -110,8 +110,8 @@ let sizes = [
   { w: 480, h: 340 }
 ];
 
-let moveX = -2000;
-let moveY = -1200;
+let moveX = -4500;
+let moveY = -3200;
 let scale = 1;
 
 const page = document.getElementById("page");
@@ -130,12 +130,12 @@ async function loadData() {
     items = [];
   }
 
-  for (let i = 0; i < 15; i++) {
-    makeBubble();
+  for (let i = 0; i < 18; i++) {
+    makeBubble(0, 0);
   }
 }
 
-function makeBubble() {
+function makeBubble(directionX, directionY) {
   if (items.length === 0) return;
 
   let block = items[Math.floor(Math.random() * items.length)];
@@ -152,16 +152,30 @@ function makeBubble() {
   let w = size.w;
   let h = size.h;
 
+  let viewX = -moveX + window.innerWidth / 2;
+  let viewY = -moveY + window.innerHeight / 2;
+
   let x;
   let y;
   let ok = false;
 
   for (let tries = 0; tries < 300; tries++) {
-    let centerX = -moveX + window.innerWidth / 2;
-    let centerY = -moveY + window.innerHeight / 2;
 
-    x = centerX - 1200 + Math.random() * 2400;
-    y = centerY - 850 + Math.random() * 1700;
+    if (directionX > 0) {
+      x = viewX + 700 + Math.random() * 1200;
+    } else if (directionX < 0) {
+      x = viewX - 1900 + Math.random() * 1200;
+    } else {
+      x = viewX - 900 + Math.random() * 1800;
+    }
+
+    if (directionY > 0) {
+      y = viewY + 500 + Math.random() * 1000;
+    } else if (directionY < 0) {
+      y = viewY - 1500 + Math.random() * 1000;
+    } else {
+      y = viewY - 700 + Math.random() * 1400;
+    }
 
     ok = true;
 
@@ -225,8 +239,23 @@ win.addEventListener("wheel", function(event) {
     moveX -= event.deltaX;
     moveY -= event.deltaY;
 
-    if (Math.random() < 0.25) {
-      makeBubble();
+    let directionX = 0;
+    let directionY = 0;
+
+    if (event.deltaX > 0) {
+      directionX = 1;
+    } else if (event.deltaX < 0) {
+      directionX = -1;
+    }
+
+    if (event.deltaY > 0) {
+      directionY = 1;
+    } else if (event.deltaY < 0) {
+      directionY = -1;
+    }
+
+    if (Math.random() < 0.3) {
+      makeBubble(directionX, directionY);
     }
   }
 
