@@ -20,21 +20,24 @@
       line-height: 1.4;
       z-index: 10;
     }
-    
+
+    /* 🔥 깔끔한 double underline */
     .title span {
       display: inline-block;
-      border-bottom: 3px solid black;
-      padding-bottom: 2px;   
       position: relative;
+
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
     }
 
     .title span::after {
       content: "";
       position: absolute;
       left: 0;
-      bottom: -4px;      
+      bottom: -6px;   /* 🔥 두 줄 간격 */
       width: 100%;
-      height: 3px;
+      height: 2px;
       background: black;
     }
 
