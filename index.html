@@ -12,6 +12,29 @@
       font-family: Arial;
     }
 
+    .title {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      font-size: 26px;
+      line-height: 1.2;
+      z-index: 10;
+    }
+
+    .title span {
+      border-bottom: 4px solid black;
+    }
+
+    .mode {
+      position: fixed;
+      top: 45px;
+      right: 95px;
+      font-size: 26px;
+      text-decoration: none;
+      color: black;
+      z-index: 10;
+    }
+
     .window {
       width: 100vw;
       height: 100vh;
@@ -41,6 +64,7 @@
       top: 10%;
       border-radius: 50%;
       overflow: hidden;
+      background: #aaa;
     }
 
     .photo img {
@@ -48,10 +72,26 @@
       height: 100%;
       object-fit: cover;
     }
+
+    .info {
+      position: absolute;
+      width: 100%;
+      bottom: 14%;
+      text-align: center;
+      font-size: 15px;
+      transform: rotate(15deg);
+    }
   </style>
 </head>
 
 <body>
+
+<div class="title">
+  <span>PARSONS SURVIVAL</span><br>
+  <span>NETWORK</span>
+</div>
+
+<a href="index2.html" class="mode">offering</a>
 
 <div class="window" id="window">
   <div class="page" id="page"></div>
@@ -77,39 +117,33 @@ const page = document.getElementById("page");
 const win = document.getElementById("window");
 
 function applyTransform() {
-  page.style.transform =
-    "translate(" + moveX + "px," + moveY + "px) scale(" + scale + ")";
+  page.style.transform = "translate(" + moveX + "px, " + moveY + "px) scale(" + scale + ")";
 }
 
 async function loadData() {
-  const res = await fetch(arenaData);
-  const data = await res.json();
-  items = data.data;
+  try {
+    const res = await fetch(arenaData);
+    const data = await res.json();
+    items = data.data;
+  } catch {
+    items = [];
+  }
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 30; i++) {
     makeBubble();
   }
 }
 
 function makeBubble() {
-  if (items.length === 0) return;
-
-  let block = items[Math.floor(Math.random() * items.length)];
-
-  let imageURL =
-    block?.image?.display?.url ||
-    block?.image?.original?.url ||
-    block?.image?.thumb?.url;
-
-  if (!imageURL) return;
-
   let size = sizes[Math.floor(Math.random() * sizes.length)];
   let w = size.w;
   let h = size.h;
 
-  let x, y, ok;
+  let x;
+  let y;
+  let ok = false;
 
-  for (let tries = 0; tries < 200; tries++) {
+  for (let tries = 0; tries < 300; tries++) {
     x = 2000 + Math.random() * 3000;
     y = 1500 + Math.random() * 2000;
 
@@ -145,38 +179,53 @@ function makeBubble() {
   let photo = document.createElement("div");
   photo.className = "photo";
 
-  let img = document.createElement("img");
-  img.src = imageURL;
+  if (items.length > 0) {
+    let block = items[Math.floor(Math.random() * items.length)];
 
-  photo.appendChild(img);
+    let imageURL =
+      block?.image?.display?.url ||
+      block?.image?.original?.url ||
+      block?.image?.thumb?.url;
+
+    if (imageURL) {
+      let img = document.createElement("img");
+      img.src = imageURL;
+      photo.appendChild(img);
+    }
+  }
+
+  let info = document.createElement("div");
+  info.className = "info";
+  info.innerText = "title / urgency level";
+
   bubble.appendChild(photo);
+  bubble.appendChild(info);
   page.appendChild(bubble);
 
-  placed.push({ x, y, w, h });
+  placed.push({ x: x, y: y, w: w, h: h });
 }
 
 applyTransform();
+loadData();
 
-win.addEventListener("wheel", function(e) {
-  e.preventDefault();
+win.addEventListener("wheel", function(event) {
+  event.preventDefault();
 
-  if (e.ctrlKey) {
-    scale += e.deltaY * -0.001;
+  if (event.ctrlKey) {
+    scale += event.deltaY * -0.001;
+
     if (scale < 0.5) scale = 0.5;
     if (scale > 2) scale = 2;
   } else {
-    moveX -= e.deltaX;
-    moveY -= e.deltaY;
+    moveX -= event.deltaX;
+    moveY -= event.deltaY;
 
-    for (let i = 0; i < 2; i++) {
-      makeBubble();
-    }
+    makeBubble();
+    makeBubble();
   }
 
   applyTransform();
 }, { passive: false });
-
-loadData();
 </script>
 
 </body>
