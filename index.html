@@ -38,7 +38,6 @@
       top: 30px;
       left: 30px;
       font-size: 26px;
-      line-height: 1.2;
       z-index: 10;
     }
 
@@ -104,7 +103,7 @@
 </div>
 
 <script>
-const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=80";
+const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=60";
 
 async function loadBubbles() {
   const res = await fetch(arenaData);
@@ -113,13 +112,16 @@ async function loadBubbles() {
 
   const page = document.getElementById("page");
 
+  let placed = [];
+
   let sizes = [
-    { w: 70, h: 50 },
-    { w: 140, h: 100 },
-    { w: 280, h: 200 }
+    { w: 120, h: 90 },
+    { w: 220, h: 160 },
+    { w: 420, h: 300 }
   ];
 
   items.forEach((block) => {
+
     let imageURL =
       block?.image?.display?.url ||
       block?.image?.original?.url ||
@@ -131,9 +133,9 @@ async function loadBubbles() {
     let r = Math.random();
     let base;
 
-    if (r < 0.6) {
+    if (r < 0.5) {
       base = sizes[0];
-    } else if (r < 0.9) {
+    } else if (r < 0.85) {
       base = sizes[1];
     } else {
       base = sizes[2];
@@ -142,8 +144,38 @@ async function loadBubbles() {
     let w = base.w;
     let h = base.h;
 
-    let x = Math.random() * (3000 - w);
-    let y = Math.random() * (2000 - h);
+    let x, y, ok;
+    let tries = 0;
+
+    do {
+      ok = true;
+
+      x = 700 + Math.random() * (1600 - w);
+      y = 350 + Math.random() * (1000 - h);
+
+      for (let j = 0; j < placed.length; j++) {
+        let b = placed[j];
+        let gap = 15;
+
+        let overlap =
+          x < b.x + b.w + gap &&
+          x + w + gap > b.x &&
+          y < b.y + b.h + gap &&
+          y + h + gap > b.y;
+
+        if (overlap) {
+          ok = false;
+          break;
+        }
+      }
+
+      tries++;
+
+      if (tries > 400) {
+        ok = true;
+      }
+
+    } while (!ok);
 
     let bubble = document.createElement("div");
     bubble.className = "bubble";
@@ -166,6 +198,8 @@ async function loadBubbles() {
     bubble.appendChild(photo);
     bubble.appendChild(info);
     page.appendChild(bubble);
+
+    placed.push({ x: x, y: y, w: w, h: h });
   });
 }
 
