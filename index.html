@@ -29,8 +29,6 @@
       width: 3000px;
       height: 2000px;
       background: white;
-      left: 0;
-      top: 0;
     }
 
     .title {
@@ -38,6 +36,7 @@
       top: 30px;
       left: 30px;
       font-size: 26px;
+      line-height: 1.2;
       z-index: 10;
     }
 
@@ -50,9 +49,9 @@
       top: 45px;
       right: 95px;
       font-size: 26px;
-      z-index: 10;
       text-decoration: none;
       color: black;
+      z-index: 10;
     }
 
     .bubble {
@@ -120,8 +119,7 @@ async function loadBubbles() {
     { w: 420, h: 300 }
   ];
 
-  items.forEach((block) => {
-
+  items.forEach(function(block) {
     let imageURL =
       block?.image?.display?.url ||
       block?.image?.original?.url ||
@@ -130,52 +128,39 @@ async function loadBubbles() {
 
     if (!imageURL) return;
 
-    let r = Math.random();
-    let base;
+    let size = sizes[Math.floor(Math.random() * sizes.length)];
+    let w = size.w;
+    let h = size.h;
 
-    if (r < 0.5) {
-      base = sizes[0];
-    } else if (r < 0.85) {
-      base = sizes[1];
-    } else {
-      base = sizes[2];
-    }
+    let x;
+    let y;
+    let goodSpot = false;
 
-    let w = base.w;
-    let h = base.h;
+    for (let tries = 0; tries < 500; tries++) {
+      x = 600 + Math.random() * (1800 - w);
+      y = 300 + Math.random() * (1200 - h);
 
-    let x, y, ok;
-    let tries = 0;
+      goodSpot = true;
 
-    do {
-      ok = true;
+      for (let i = 0; i < placed.length; i++) {
+        let b = placed[i];
+        let gap = 20;
 
-      x = 700 + Math.random() * (1600 - w);
-      y = 350 + Math.random() * (1000 - h);
-
-      for (let j = 0; j < placed.length; j++) {
-        let b = placed[j];
-        let gap = 15;
-
-        let overlap =
+        if (
           x < b.x + b.w + gap &&
           x + w + gap > b.x &&
           y < b.y + b.h + gap &&
-          y + h + gap > b.y;
-
-        if (overlap) {
-          ok = false;
+          y + h + gap > b.y
+        ) {
+          goodSpot = false;
           break;
         }
       }
 
-      tries++;
+      if (goodSpot) break;
+    }
 
-      if (tries > 400) {
-        ok = true;
-      }
-
-    } while (!ok);
+    if (!goodSpot) return;
 
     let bubble = document.createElement("div");
     bubble.className = "bubble";
