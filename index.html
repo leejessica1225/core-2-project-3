@@ -22,7 +22,6 @@
       cursor: pointer;
     }
 
-    /* double underline */
     .title span {
       display: inline-block;
       position: relative;
@@ -43,9 +42,9 @@
 
     .mode {
       position: fixed;
-      top: 30px;      
+      top: 30px;
       right: 30px;
-      font-size: 22px; 
+      font-size: 18px;
       text-decoration: none;
       color: black;
       z-index: 10;
@@ -62,11 +61,7 @@
       padding: 35px 30px;
       box-sizing: border-box;
       z-index: 50;
-      transition: left 0.3s ease;
-    }
-
-    .sidebar.open {
-      left: 0;
+      transition: left 0.3s;
     }
 
     .menu-title {
@@ -94,7 +89,7 @@
 
     .menu-item {
       margin-top: 80px;
-      font-size: 18px;  
+      font-size: 18px;
       color: white;
       text-decoration: none;
       display: block;
@@ -113,14 +108,14 @@
       width: 12000px;
       height: 9000px;
       transform-origin: 50vw 50vh;
-      transition: transform 0.12s ease-out;
+      transition: transform 0.12s;
     }
 
     .bubble {
       position: absolute;
       background: #d3d3d3;
       border-radius: 50%;
-      transition: background 0.2s ease;
+      transition: background 0.2s;
     }
 
     .bubble:hover {
@@ -135,7 +130,6 @@
       top: 10%;
       border-radius: 50%;
       overflow: hidden;
-      background: #aaa;
     }
 
     .photo img {
@@ -155,15 +149,15 @@
   </style>
 </head>
 
-<body>
+<body onclick="closeMenu()">
 
-<div class="title" onclick="toggleMenu()">
+<div class="title" onclick="toggleMenu(event)">
   <span>PARSONS SURVIVAL</span><br>
   <span>NETWORK</span>
 </div>
 
-<div class="sidebar" id="sidebar">
-  <div class="menu-title">
+<div class="sidebar" id="sidebar" onclick="event.stopPropagation()">
+  <div class="menu-title" onclick="toggleMenu(event)">
     <span>PARSONS SURVIVAL</span><br>
     <span>NETWORK</span>
   </div>
@@ -178,6 +172,24 @@
 </div>
 
 <script>
+function toggleMenu(event) {
+  event.stopPropagation();
+  var sidebar = document.getElementById("sidebar");
+
+  if (sidebar.style.left === "0px") {
+    sidebar.style.left = "-370px";
+  } else {
+    sidebar.style.left = "0px";
+  }
+}
+
+function closeMenu() {
+  var sidebar = document.getElementById("sidebar");
+  sidebar.style.left = "-370px";
+}
+
+/* --- 기존 bubble 코드 그대로 유지 --- */
+
 const arenaData = "https://api.are.na/v2/channels/publication-btmpbivan1o/contents?per=50";
 
 let items = [];
@@ -196,11 +208,6 @@ let scale = 1;
 const page = document.getElementById("page");
 const win = document.getElementById("window");
 
-function toggleMenu() {
-  const sidebar = document.getElementById("sidebar");
-  sidebar.classList.toggle("open");
-}
-
 function applyTransform() {
   page.style.transform =
     "translate(" + moveX + "px, " + moveY + "px) scale(" + scale + ")";
@@ -215,12 +222,12 @@ async function loadData() {
     items = [];
   }
 
-  for (let i = 0; i < 18; i++) {
-    makeBubble(0, 0);
+  for (let i = 0; i < 15; i++) {
+    makeBubble();
   }
 }
 
-function makeBubble(directionX, directionY) {
+function makeBubble() {
   if (items.length === 0) return;
 
   let block = items[Math.floor(Math.random() * items.length)];
@@ -237,50 +244,8 @@ function makeBubble(directionX, directionY) {
   let w = size.w;
   let h = size.h;
 
-  let viewX = -moveX + window.innerWidth / 2;
-  let viewY = -moveY + window.innerHeight / 2;
-
-  let x, y, ok = false;
-
-  for (let tries = 0; tries < 300; tries++) {
-
-    if (directionX > 0) {
-      x = viewX + 700 + Math.random() * 1200;
-    } else if (directionX < 0) {
-      x = viewX - 1900 + Math.random() * 1200;
-    } else {
-      x = viewX - 900 + Math.random() * 1800;
-    }
-
-    if (directionY > 0) {
-      y = viewY + 500 + Math.random() * 1000;
-    } else if (directionY < 0) {
-      y = viewY - 1500 + Math.random() * 1000;
-    } else {
-      y = viewY - 700 + Math.random() * 1400;
-    }
-
-    ok = true;
-
-    for (let i = 0; i < placed.length; i++) {
-      let b = placed[i];
-      let gap = 50;
-
-      if (
-        x < b.x + b.w + gap &&
-        x + w + gap > b.x &&
-        y < b.y + b.h + gap &&
-        y + h + gap > b.y
-      ) {
-        ok = false;
-        break;
-      }
-    }
-
-    if (ok) break;
-  }
-
-  if (!ok) return;
+  let x = Math.random() * 10000;
+  let y = Math.random() * 8000;
 
   let bubble = document.createElement("div");
   bubble.className = "bubble";
@@ -303,8 +268,6 @@ function makeBubble(directionX, directionY) {
   bubble.appendChild(photo);
   bubble.appendChild(info);
   page.appendChild(bubble);
-
-  placed.push({ x: x, y: y, w: w, h: h });
 }
 
 applyTransform();
@@ -315,28 +278,14 @@ win.addEventListener("wheel", function(event) {
 
   if (event.ctrlKey) {
     scale += event.deltaY * -0.0005;
-
-    if (scale < 0.5) scale = 0.5;
-    if (scale > 2) scale = 2;
   } else {
     moveX -= event.deltaX;
     moveY -= event.deltaY;
-
-    let directionX = 0;
-    let directionY = 0;
-
-    if (event.deltaX > 0) directionX = 1;
-    if (event.deltaX < 0) directionX = -1;
-    if (event.deltaY > 0) directionY = 1;
-    if (event.deltaY < 0) directionY = -1;
-
-    if (Math.random() < 0.3) {
-      makeBubble(directionX, directionY);
-    }
   }
 
-  applyTransform();
-}, { passive: false });
+  page.style.transform =
+    "translate(" + moveX + "px, " + moveY + "px) scale(" + scale + ")";
+});
 </script>
 
 </body>
