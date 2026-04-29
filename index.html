@@ -17,27 +17,8 @@
       top: 30px;
       left: 30px;
       font-size: 26px;
-      line-height: 1.4;
-      z-index: 10;
       cursor: pointer;
-    }
-
-    .title span {
-      display: inline-block;
-      position: relative;
-      text-decoration: underline;
-      text-decoration-thickness: 2px;
-      text-underline-offset: 4px;
-    }
-
-    .title span::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -6px;
-      width: 100%;
-      height: 2px;
-      background: black;
+      z-index: 10;
     }
 
     .mode {
@@ -45,80 +26,54 @@
       top: 30px;
       right: 30px;
       font-size: 18px;
-      text-decoration: none;
-      color: black;
       z-index: 10;
     }
 
     .sidebar {
       position: fixed;
       top: 0;
-      left: -370px;
-      width: 370px;
-      height: 100vh;
+      left: -300px;
+      width: 300px;
+      height: 100%;
       background: black;
       color: white;
-      padding: 35px 30px;
-      box-sizing: border-box;
-      z-index: 50;
-      transition: left 0.3s;
-    }
-
-    .menu-title {
-      font-size: 26px;
-      line-height: 1.4;
-      cursor: pointer;
-    }
-
-    .menu-title span {
-      display: inline-block;
-      text-decoration: underline;
+      padding: 30px;
+      transition: 0.3s;
+      z-index: 20;
     }
 
     .menu-item {
-      margin-top: 80px;
+      margin-top: 40px;
       font-size: 18px;
-      color: white;
-      text-decoration: none;
-      display: block;
     }
 
     .window {
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      border: 2px solid black;
-      position: relative;
     }
 
     .page {
       position: absolute;
-      width: 12000px;
-      height: 9000px;
+      width: 10000px;
+      height: 8000px;
       transform-origin: 0 0;
-      transition: transform 0.08s ease-out;
     }
 
     .bubble {
       position: absolute;
-      background: #d3d3d3;
+      background: #d9d9d9;
       border-radius: 50%;
-      transition: background 0.2s;
-    }
-
-    .bubble:hover {
-      background: #eeeeee;
     }
 
     .photo {
       position: absolute;
       width: 80%;
-      height: 65%;
+      height: 60%;
       left: 10%;
       top: 10%;
       border-radius: 50%;
       overflow: hidden;
-      background: #aaa;
     }
 
     .photo img {
@@ -127,235 +82,151 @@
       object-fit: cover;
     }
 
-    .info {
+    svg {
       position: absolute;
-      bottom: 18%;
-      left: 50%;
-      transform: translateX(-50%);
-      white-space: nowrap;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
     }
 
-    .left {
-      display: inline-block;
-      transform: rotate(-12deg);
-    }
-
-    .right {
-      display: inline-block;
-      transform: rotate(-28deg);
-      margin-left: 6px;
-    }
   </style>
 </head>
 
 <body onclick="closeMenu()">
 
 <div class="title" onclick="toggleMenu(event)">
-  <span>PARSONS SURVIVAL</span><br>
-  <span>NETWORK</span>
+  PARSONS SURVIVAL<br>NETWORK
 </div>
 
 <div class="sidebar" id="sidebar" onclick="event.stopPropagation()">
-  <div class="menu-title" onclick="toggleMenu(event)">
-    <span>PARSONS SURVIVAL</span><br>
-    <span>NETWORK</span>
-  </div>
-
-  <a href="create.html" class="menu-item">create a post</a>
+  <div onclick="toggleMenu(event)">PARSONS<br>NETWORK</div>
+  <div class="menu-item">create a post</div>
 </div>
 
-<a href="index2.html" class="mode">offering</a>
+<div class="mode">offering</div>
 
 <div class="window" id="window">
   <div class="page" id="page"></div>
 </div>
 
 <script>
-function toggleMenu(event) {
-  event.stopPropagation();
-  var sidebar = document.getElementById("sidebar");
 
-  if (sidebar.style.left === "0px") {
-    sidebar.style.left = "-370px";
-  } else {
-    sidebar.style.left = "0px";
-  }
+function toggleMenu(e){
+  e.stopPropagation();
+  let s = document.getElementById("sidebar");
+  s.style.left = (s.style.left === "0px") ? "-300px" : "0px";
 }
 
-function closeMenu() {
-  document.getElementById("sidebar").style.left = "-370px";
+function closeMenu(){
+  document.getElementById("sidebar").style.left = "-300px";
 }
 
-const arenaData = "https://api.are.na/v2/channels/publication-btmpbivan1o/contents?per=50";
-
-let items = [];
-let placed = [];
+let page = document.getElementById("page");
 
 let sizes = [
-  { w: 160, h: 120 },
-  { w: 300, h: 220 },
-  { w: 480, h: 340 }
+  {w:160, h:120},
+  {w:300, h:220},
+  {w:480, h:340}
 ];
 
-let moveX = -4500;
-let moveY = -3200;
+let moveX = -4000;
+let moveY = -3000;
 let scale = 1;
 
-const page = document.getElementById("page");
-const win = document.getElementById("window");
-
-function applyTransform() {
-  page.style.transform =
-    "translate(" + moveX + "px, " + moveY + "px) scale(" + scale + ")";
+function applyTransform(){
+  page.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
 }
 
-async function loadData() {
-  try {
-    const res = await fetch(arenaData);
-    const data = await res.json();
-    items = data.contents;
-  } catch {
-    items = [];
-  }
-
-  for (let i = 0; i < 18; i++) {
-    makeBubble(0, 0);
-  }
-}
-
-function makeBubble(directionX, directionY) {
-  if (items.length === 0) return;
-
-  let block = items[Math.floor(Math.random() * items.length)];
-
-  let imageURL =
-    block.image?.display?.url ||
-    block.image?.large?.url ||
-    block.image?.original?.url ||
-    block.image?.thumb?.url;
-
-  if (!imageURL) return;
-
-  let size = sizes[Math.floor(Math.random() * sizes.length)];
+function makeBubble(){
+  let size = sizes[Math.floor(Math.random()*3)];
   let w = size.w;
   let h = size.h;
 
-  let viewX = -moveX + window.innerWidth / 2;
-  let viewY = -moveY + window.innerHeight / 2;
-
-  let x, y, ok = false;
-
-  for (let tries = 0; tries < 300; tries++) {
-
-    if (directionX > 0) {
-      x = viewX + 700 + Math.random() * 1200;
-    } else if (directionX < 0) {
-      x = viewX - 1900 + Math.random() * 1200;
-    } else {
-      x = viewX - 900 + Math.random() * 1800;
-    }
-
-    if (directionY > 0) {
-      y = viewY + 500 + Math.random() * 1000;
-    } else if (directionY < 0) {
-      y = viewY - 1500 + Math.random() * 1000;
-    } else {
-      y = viewY - 700 + Math.random() * 1400;
-    }
-
-    ok = true;
-
-    for (let i = 0; i < placed.length; i++) {
-      let b = placed[i];
-      let gap = 50;
-
-      if (
-        x < b.x + b.w + gap &&
-        x + w + gap > b.x &&
-        y < b.y + b.h + gap &&
-        y + h + gap > b.y
-      ) {
-        ok = false;
-        break;
-      }
-    }
-
-    if (ok) break;
-  }
-
-  if (!ok) return;
-
   let bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.style.width = w + "px";
-  bubble.style.height = h + "px";
-  bubble.style.left = x + "px";
-  bubble.style.top = y + "px";
+  bubble.style.width = w+"px";
+  bubble.style.height = h+"px";
+  bubble.style.left = Math.random()*9000+"px";
+  bubble.style.top = Math.random()*7000+"px";
 
   let photo = document.createElement("div");
   photo.className = "photo";
 
   let img = document.createElement("img");
-  img.src = imageURL;
-
-  let info = document.createElement("div");
-  info.className = "info";
-
-  if (w === 160) info.style.fontSize = "12px";
-  else if (w === 300) info.style.fontSize = "20px";
-  else info.style.fontSize = "34px";
-
-  info.innerHTML = `
-    <span class="left">title /</span>
-    <span class="right">urgent level</span>
-  `;
+  img.src = "https://picsum.photos/300";
 
   photo.appendChild(img);
   bubble.appendChild(photo);
-  bubble.appendChild(info);
-  page.appendChild(bubble);
 
-  placed.push({ x: x, y: y, w: w, h: h });
+  // 🔥 SVG 곡선 텍스트
+  let svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+
+  let path = document.createElementNS("http://www.w3.org/2000/svg","path");
+
+  let id = "curve"+Math.random();
+
+  if(w===480){
+    path.setAttribute("d","M 0 0 C 0 45 25 88 70 120 C 115 152 176 170 240 170 C 303 170 364 152 409 120 C 454 88 480 45 480 0");
+  }
+  if(w===300){
+    path.setAttribute("d","M 0 0 C 0 30 20 60 45 80 C 80 110 120 120 150 120 C 180 120 220 110 255 80 C 280 60 300 30 300 0");
+  }
+  if(w===160){
+    path.setAttribute("d","M 0 0 C 0 20 15 40 30 55 C 60 80 100 80 130 55 C 145 40 160 20 160 0");
+  }
+
+  path.setAttribute("id",id);
+  path.setAttribute("fill","none");
+
+  let text = document.createElementNS("http://www.w3.org/2000/svg","text");
+
+  if(w===160) text.setAttribute("font-size","12");
+  if(w===300) text.setAttribute("font-size","20");
+  if(w===480) text.setAttribute("font-size","34");
+
+  let textPath = document.createElementNS("http://www.w3.org/2000/svg","textPath");
+
+  textPath.setAttribute("href","#"+id);
+  textPath.setAttribute("startOffset","30%");
+  textPath.setAttribute("text-anchor","middle");
+
+  textPath.textContent = "title / urgency level";
+
+  text.appendChild(textPath);
+  svg.appendChild(path);
+  svg.appendChild(text);
+
+  bubble.appendChild(svg);
+  page.appendChild(bubble);
 }
 
+for(let i=0;i<20;i++) makeBubble();
+
 applyTransform();
-loadData();
 
-win.addEventListener("wheel", function(event) {
-  event.preventDefault();
+window.addEventListener("wheel", function(e){
+  e.preventDefault();
 
-  if (event.ctrlKey) {
-    let oldScale = scale;
+  if(e.ctrlKey){
+    let old = scale;
+    scale += e.deltaY * -0.002;
 
-    scale += event.deltaY * -0.002;
+    let mx = e.clientX;
+    let my = e.clientY;
 
-    if (scale < 0.5) scale = 0.5;
-    if (scale > 2) scale = 2;
-
-    let mouseX = event.clientX;
-    let mouseY = event.clientY;
-
-    moveX = mouseX - (mouseX - moveX) * (scale / oldScale);
-    moveY = mouseY - (mouseY - moveY) * (scale / oldScale);
+    moveX = mx - (mx - moveX)*(scale/old);
+    moveY = my - (my - moveY)*(scale/old);
   } else {
-    moveX -= event.deltaX;
-    moveY -= event.deltaY;
-
-    let directionX = 0;
-    let directionY = 0;
-
-    if (event.deltaX > 0) directionX = 1;
-    if (event.deltaX < 0) directionX = -1;
-    if (event.deltaY > 0) directionY = 1;
-    if (event.deltaY < 0) directionY = -1;
-
-    if (Math.random() < 0.3) {
-      makeBubble(directionX, directionY);
-    }
+    moveX -= e.deltaX;
+    moveY -= e.deltaY;
   }
 
   applyTransform();
-}, { passive: false });
+},{passive:false});
+
 </script>
 
 </body>
