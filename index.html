@@ -245,11 +245,11 @@ function makeCurveText(bubble, w, h, block) {
   path.setAttribute("fill", "none");
 
   if (w === 160) {
-    path.setAttribute("d", "M 15 80 C 45 110 115 110 145 80");
+    path.setAttribute("d", "M 0 0 C 0 7.87931 2.06926 15.6815 6.08964 22.961 C 10.11 30.2405 16.0028 36.8549 23.4315 42.4264 C 30.8601 47.9979 39.6793 52.4175 49.3853 55.4328 C 59.0914 58.4481 69.4942 60 80 60 C 90.5057 60 100.909 58.4481 110.615 55.4328 C 120.321 52.4175 129.14 47.9979 136.569 42.4264 C 143.997 36.8549 149.89 30.2405 153.91 22.961 C 157.931 15.6815 160 7.87931 160 0");
   } else if (w === 300) {
-    path.setAttribute("d", "M 35 150 C 95 210 205 210 265 150");
+    path.setAttribute("d", "M 0 0 C 0 14.4454 3.87986 28.7494 11.4181 42.0952 C 18.9563 55.441 30.0052 67.5673 43.934 77.7817 C 57.8628 87.9962 74.3986 96.0987 92.5975 101.627 C 110.796 107.155 130.302 110 150 110 C 169.698 110 189.204 107.155 207.403 101.627 C 225.601 96.0987 242.137 87.9962 256.066 77.7817 C 269.995 67.5673 281.044 55.441 288.582 42.0952 C 296.12 28.7494 300 14.4454 300 0");
   } else {
-    path.setAttribute("d", "M 55 235 C 145 330 335 330 425 235");
+    path.setAttribute("d", "M 0 0 C 0 45.0868 25.2857 88.327 70.2944 120.208 C 115.303 152.089 176.348 170 240 170 C 303.652 170 364.697 152.089 409.706 120.208 C 454.714 88.327 480 45.0868 480 0");
   }
 
   let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -264,7 +264,7 @@ function makeCurveText(bubble, w, h, block) {
 
   let textPath = document.createElementNS("http://www.w3.org/2000/svg", "textPath");
   textPath.setAttribute("href", "#" + curveId);
-  textPath.setAttribute("startOffset", "45%");
+  textPath.setAttribute("startOffset", "38%");
   textPath.setAttribute("text-anchor", "middle");
 
   let titleText = block.title || "title";
