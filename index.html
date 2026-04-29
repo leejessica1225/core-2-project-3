@@ -245,11 +245,11 @@ function makeCurveText(bubble, w, h, block) {
   path.setAttribute("fill", "none");
 
   if (w === 160) {
-    path.setAttribute("d", "M 0 0 C 0 20 15 40 30 55 C 60 80 100 80 130 55 C 145 40 160 20 160 0");
+    path.setAttribute("d", "M 15 80 C 45 110 115 110 145 80");
   } else if (w === 300) {
-    path.setAttribute("d", "M 0 0 C 0 30 20 60 45 80 C 80 110 120 120 150 120 C 180 120 220 110 255 80 C 280 60 300 30 300 0");
+    path.setAttribute("d", "M 35 150 C 95 210 205 210 265 150");
   } else {
-    path.setAttribute("d", "M 0 0 C 0 45.0868 25.2857 88.327 70.2944 120.208 C 115.303 152.089 176.348 170 240 170 C 303.652 170 364.697 152.089 409.706 120.208 C 454.714 88.327 480 45.0868 480 0");
+    path.setAttribute("d", "M 55 235 C 145 330 335 330 425 235");
   }
 
   let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -264,7 +264,7 @@ function makeCurveText(bubble, w, h, block) {
 
   let textPath = document.createElementNS("http://www.w3.org/2000/svg", "textPath");
   textPath.setAttribute("href", "#" + curveId);
-  textPath.setAttribute("startOffset", "30%");
+  textPath.setAttribute("startOffset", "45%");
   textPath.setAttribute("text-anchor", "middle");
 
   let titleText = block.title || "title";
