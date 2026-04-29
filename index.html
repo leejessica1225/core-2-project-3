@@ -44,7 +44,7 @@
       position: fixed;
       top: 30px;
       right: 30px;
-      font-size: 22px;
+      font-size: 18px;
       text-decoration: none;
       color: black;
       z-index: 10;
@@ -109,14 +109,14 @@
       width: 12000px;
       height: 9000px;
       transform-origin: 0 0;
-      transition: transform 0.12s ease-out;
+      transition: transform 0.08s ease-out;
     }
 
     .bubble {
       position: absolute;
       background: #d3d3d3;
       border-radius: 50%;
-      transition: background 0.2s ease;
+      transition: background 0.2s;
     }
 
     .bubble:hover {
@@ -140,13 +140,19 @@
       object-fit: cover;
     }
 
-    .info {
+    .curveText {
       position: absolute;
       width: 100%;
-      bottom: 14%;
-      text-align: center;
-      font-size: 15px;
-      transform: rotate(15deg);
+      height: 100%;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .curveText text {
+      fill: black;
+      font-family: Arial;
     }
   </style>
 </head>
@@ -187,8 +193,7 @@ function toggleMenu(event) {
 }
 
 function closeMenu() {
-  var sidebar = document.getElementById("sidebar");
-  sidebar.style.left = "-370px";
+  document.getElementById("sidebar").style.left = "-370px";
 }
 
 const arenaData = "https://api.are.na/v2/channels/publication-btmpbivan1o/contents?per=50";
@@ -228,6 +233,51 @@ async function loadData() {
   }
 }
 
+function makeCurveText(bubble, w, h, block) {
+  let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.classList.add("curveText");
+  svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+
+  let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  let curveId = "curve" + placed.length + Math.floor(Math.random() * 10000);
+
+  path.setAttribute("id", curveId);
+  path.setAttribute("fill", "none");
+
+  if (w === 160) {
+    path.setAttribute("d", "M 0 0 C 0 20 15 40 30 55 C 60 80 100 80 130 55 C 145 40 160 20 160 0");
+  } else if (w === 300) {
+    path.setAttribute("d", "M 0 0 C 0 30 20 60 45 80 C 80 110 120 120 150 120 C 180 120 220 110 255 80 C 280 60 300 30 300 0");
+  } else {
+    path.setAttribute("d", "M 0 0 C 0 45.0868 25.2857 88.327 70.2944 120.208 C 115.303 152.089 176.348 170 240 170 C 303.652 170 364.697 152.089 409.706 120.208 C 454.714 88.327 480 45.0868 480 0");
+  }
+
+  let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+
+  if (w === 160) {
+    text.setAttribute("font-size", "12");
+  } else if (w === 300) {
+    text.setAttribute("font-size", "20");
+  } else {
+    text.setAttribute("font-size", "34");
+  }
+
+  let textPath = document.createElementNS("http://www.w3.org/2000/svg", "textPath");
+  textPath.setAttribute("href", "#" + curveId);
+  textPath.setAttribute("startOffset", "30%");
+  textPath.setAttribute("text-anchor", "middle");
+
+  let titleText = block.title || "title";
+  let urgencyText = "urgency level";
+
+  textPath.textContent = titleText + " / " + urgencyText;
+
+  text.appendChild(textPath);
+  svg.appendChild(path);
+  svg.appendChild(text);
+  bubble.appendChild(svg);
+}
+
 function makeBubble(directionX, directionY) {
   if (items.length === 0) return;
 
@@ -251,7 +301,6 @@ function makeBubble(directionX, directionY) {
   let x, y, ok = false;
 
   for (let tries = 0; tries < 300; tries++) {
-
     if (directionX > 0) {
       x = viewX + 700 + Math.random() * 1200;
     } else if (directionX < 0) {
@@ -303,13 +352,11 @@ function makeBubble(directionX, directionY) {
   let img = document.createElement("img");
   img.src = imageURL;
 
-  let info = document.createElement("div");
-  info.className = "info";
-  info.innerText = "title / urgency level";
-
   photo.appendChild(img);
   bubble.appendChild(photo);
-  bubble.appendChild(info);
+
+  makeCurveText(bubble, w, h, block);
+
   page.appendChild(bubble);
 
   placed.push({ x: x, y: y, w: w, h: h });
@@ -324,7 +371,7 @@ win.addEventListener("wheel", function(event) {
   if (event.ctrlKey) {
     let oldScale = scale;
 
-    scale += event.deltaY * -0.003;
+    scale += event.deltaY * -0.002;
 
     if (scale < 0.5) scale = 0.5;
     if (scale > 2) scale = 2;
