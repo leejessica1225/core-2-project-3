@@ -249,16 +249,16 @@
     function submitForm() {
       let name = document.getElementById("name").value.trim();
       let contact = document.getElementById("contact").value.trim();
-      let location = document.getElementById("location").value.trim();
+      let userLocation = document.getElementById("location").value.trim();
       let time = document.getElementById("time").value.trim();
       let notes = document.getElementById("notes").value.trim();
 
-      if (!name || !contact || !location || !time || !notes) {
+      if (!name || !contact || !userLocation || !time || !notes) {
         alert("Fill all fields");
         return;
       }
 
-      location.href = "confirmation.html";
+      window.location.href = "confirmation.html";
     }
   </script>
 
