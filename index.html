@@ -265,13 +265,13 @@ function makeCurveText(bubble, w, h, block) {
   let maxTitleLength;
 
   if (w === 160) {
-    text.setAttribute("font-size", "10");
-    maxTitleLength = 9;
+    text.setAttribute("font-size", "14");
+    maxTitleLength = 14;
   } else if (w === 300) {
-    text.setAttribute("font-size", "16");
-    maxTitleLength = 15;
+    text.setAttribute("font-size", "24");
+    maxTitleLength = 20;
   } else {
-    text.setAttribute("font-size", "25");
+    text.setAttribute("font-size", "36");
     maxTitleLength = 24;
   }
 
@@ -282,12 +282,11 @@ function makeCurveText(bubble, w, h, block) {
 
   let parts = (block.title || "").split("/");
 
-  let urgencyText = parts[0]?.trim() || "LOW";
   let titleText = parts[1]?.trim() || "help";
 
   titleText = shortenText(titleText, maxTitleLength);
 
-  textPath.textContent = urgencyText + " / " + titleText;
+  textPath.textContent = titleText;
 
   text.appendChild(textPath);
   svg.appendChild(path);
@@ -408,7 +407,7 @@ win.addEventListener("wheel", function(event) {
   if (event.ctrlKey) {
     let oldScale = scale;
 
-    scale += event.deltaY * -0.002;
+    scale += event.deltaY * -0.005;
 
     if (scale < 0.5) scale = 0.5;
     if (scale > 2) scale = 2;
