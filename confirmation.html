@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Confirmation</title>
+  <title>Information</title>
 
   <style>
     html, body {
@@ -99,10 +99,19 @@
       display: block;
     }
 
-    .confirm-wrap {
+    .info-wrap {
       position: relative;
       width: 380px;
       height: 520px;
+
+      transform: translateY(200px);
+      opacity: 0;
+      transition: all 1.2s ease;
+    }
+
+    .info-wrap.show {
+      transform: translateY(0);
+      opacity: 1;
     }
 
     .back-box {
@@ -114,7 +123,7 @@
       top: 14px;
     }
 
-    .confirm-box {
+    .info-box {
       position: absolute;
       width: 380px;
       height: 520px;
@@ -123,7 +132,7 @@
       box-sizing: border-box;
     }
 
-    .confirm-title {
+    .info-title {
       font-size: 24px;
       margin-bottom: 18px;
     }
@@ -131,36 +140,28 @@
     .line {
       height: 1px;
       background: black;
-      margin-bottom: 25px;
+      margin-bottom: 30px;
     }
 
-    .post-title {
+    .field {
       font-size: 14px;
-      margin-bottom: 25px;
+      margin-bottom: 26px;
+      display: flex;
+      align-items: center;
     }
 
-    .small-info {
+    .field span {
+      margin-right: 6px;
+    }
+
+    input {
+      border: none;
+      outline: none;
+      background: transparent;
       font-size: 14px;
-      margin-bottom: 25px;
-    }
-
-    .description {
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-
-    .image-box {
-      width: 100%;
-      height: 140px;
-      background: #aaa;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    .image-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      font-family: Arial;
+      width: 180px;
+      padding: 0;
     }
 
     .bottom-line {
@@ -172,7 +173,7 @@
       background: black;
     }
 
-    .home {
+    .submit {
       position: absolute;
       left: 30px;
       bottom: 25px;
@@ -200,30 +201,41 @@
     <a href="create.html" class="menu-item">create a post</a>
   </div>
 
-  <div class="confirm-wrap">
+  <div class="info-wrap">
     <div class="back-box"></div>
 
-    <div class="confirm-box">
-      <div class="confirm-title">Help request confirmed!</div>
+    <div class="info-box">
+      <div class="info-title">Leave your information</div>
       <div class="line"></div>
 
-      <div class="post-title" id="postTitle"></div>
-
-      <div class="small-info">
-        <div id="urgency"></div>
-        <div id="location"></div>
-        <div id="time"></div>
+      <div class="field">
+        <span>Name:</span>
+        <input id="name" autocomplete="off">
       </div>
 
-      <div class="description" id="description"></div>
+      <div class="field">
+        <span>Contact:</span>
+        <input id="contact" autocomplete="off">
+      </div>
 
-      <div class="image-box">
-        <img id="postImage">
+      <div class="field">
+        <span>Current location:</span>
+        <input id="location" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <span>Available Time:</span>
+        <input id="time" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <span>Notes:</span>
+        <input id="notes" autocomplete="off">
       </div>
 
       <div class="bottom-line"></div>
 
-      <div class="home" onclick="goHome()">[Home]</div>
+      <div class="submit" onclick="submitForm()">[Submit]</div>
     </div>
   </div>
 
@@ -231,6 +243,7 @@
     function toggleMenu(event) {
       event.stopPropagation();
       let sidebar = document.getElementById("sidebar");
+
       if (sidebar.style.left === "0px") {
         sidebar.style.left = "-370px";
       } else {
@@ -242,30 +255,23 @@
       document.getElementById("sidebar").style.left = "-370px";
     }
 
-    function goHome() {
-      window.location.href = "index.html";
+    function submitForm() {
+      let name = document.getElementById("name").value.trim();
+      let contact = document.getElementById("contact").value.trim();
+      let userLocation = document.getElementById("location").value.trim();
+      let time = document.getElementById("time").value.trim();
+      let notes = document.getElementById("notes").value.trim();
+
+      if (!name || !contact || !userLocation || !time || !notes) {
+        alert("Fill all fields");
+        return;
+      }
+
+      window.location.href = "confirmation.html";
     }
 
-    let post = JSON.parse(localStorage.getItem("selectedPost"));
-
-    if (post) {
-      let parts = (post.title || "").split("/");
-
-      document.getElementById("postTitle").textContent = parts[1]?.trim() || "";
-      document.getElementById("urgency").textContent = parts[0]?.trim() || "";
-      document.getElementById("location").textContent = parts[2]?.trim() || "";
-      document.getElementById("time").textContent = parts[3]?.trim() || "";
-      document.getElementById("description").textContent = parts[4]?.trim() || "";
-
-      let imageURL =
-        post.image?.display?.url ||
-        post.image?.large?.url ||
-        post.image?.original?.url ||
-        post.image?.thumb?.url;
-
-      if (imageURL) {
-        document.getElementById("postImage").src = imageURL;
-      }
+    window.onload = function() {
+      document.querySelector(".info-wrap").classList.add("show");
     }
   </script>
 
