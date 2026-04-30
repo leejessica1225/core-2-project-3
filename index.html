@@ -376,10 +376,9 @@ function makeBubble(directionX, directionY) {
   bubble.style.left = x + "px";
   bubble.style.top = y + "px";
 
-  bubble.onclick = function(event) {
-    event.stopPropagation();
-    localStorage.setItem("selectedPost", JSON.stringify(block));
-    window.location.href = "post.html";
+  bubble.onclick = function() {
+  localStorage.setItem("selectedPost", JSON.stringify(block));
+  location.href = "post.html";
   };
 
   let photo = document.createElement("div");
