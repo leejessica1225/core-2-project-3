@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Information</title>
+
   <style>
     html, body {
       margin: 0;
@@ -62,8 +63,8 @@
       color: white;
       padding: 35px 30px;
       box-sizing: border-box;
-      z-index: 50;
       transition: left 0.3s;
+      z-index: 50;
     }
 
     .menu-title {
@@ -128,7 +129,6 @@
     }
 
     .line {
-      width: 100%;
       height: 1px;
       background: black;
       margin-bottom: 30px;
@@ -136,19 +136,30 @@
 
     .field {
       font-size: 14px;
-      margin-bottom: 22px;
+      margin-bottom: 26px;
+      display: flex;
+      align-items: center;
     }
 
-    .notes {
-      margin-top: 40px;
+    .field span {
+      margin-right: 6px;
+    }
+
+    input {
+      border: none;
+      outline: none;
+      background: transparent;
       font-size: 14px;
+      font-family: Arial;
+      width: 180px;
+      padding: 0;
     }
 
     .bottom-line {
       position: absolute;
       left: 30px;
       right: 30px;
-      bottom: 80px;
+      bottom: 70px;
       height: 1px;
       background: black;
     }
@@ -156,7 +167,7 @@
     .submit {
       position: absolute;
       left: 30px;
-      bottom: 35px;
+      bottom: 25px;
       font-size: 14px;
       cursor: pointer;
     }
@@ -177,6 +188,7 @@
       <span>PARSONS SURVIVAL</span><br>
       <span>NETWORK</span>
     </div>
+
     <a href="create.html" class="menu-item">create a post</a>
   </div>
 
@@ -187,15 +199,34 @@
       <div class="info-title">Leave your information</div>
       <div class="line"></div>
 
-      <div class="field">Name:</div>
-      <div class="field">Contact:</div>
-      <div class="field">Current location:</div>
-      <div class="field">Available Time:</div>
+      <div class="field">
+        <span>Name:</span>
+        <input id="name" autocomplete="off">
+      </div>
 
-      <div class="notes">Notes:</div>
+      <div class="field">
+        <span>Contact:</span>
+        <input id="contact" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <span>Current location:</span>
+        <input id="location" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <span>Available Time:</span>
+        <input id="time" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <span>Notes:</span>
+        <input id="notes" autocomplete="off">
+      </div>
 
       <div class="bottom-line"></div>
-      <div class="submit">[Submit]</div>
+
+      <div class="submit" onclick="submitForm()">[Submit]</div>
     </div>
   </div>
 
@@ -203,6 +234,7 @@
     function toggleMenu(event) {
       event.stopPropagation();
       let sidebar = document.getElementById("sidebar");
+
       if (sidebar.style.left === "0px") {
         sidebar.style.left = "-370px";
       } else {
@@ -212,6 +244,21 @@
 
     function closeMenu() {
       document.getElementById("sidebar").style.left = "-370px";
+    }
+
+    function submitForm() {
+      let name = document.getElementById("name").value.trim();
+      let contact = document.getElementById("contact").value.trim();
+      let location = document.getElementById("location").value.trim();
+      let time = document.getElementById("time").value.trim();
+      let notes = document.getElementById("notes").value.trim();
+
+      if (!name || !contact || !location || !time || !notes) {
+        alert("Fill all fields");
+        return;
+      }
+
+      location.href = "confirmation.html";
     }
   </script>
 
