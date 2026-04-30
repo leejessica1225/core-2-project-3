@@ -4,46 +4,124 @@
   <title>Parsons Survival Network</title>
 
   <style>
-    body {
+    html, body {
       margin: 0;
+      height: 100%;
+      overflow: hidden;
       background: white;
       font-family: Arial;
     }
 
-    .page {
-      position: relative;
-      height: 100vh;
-      overflow: hidden;
-      border: 2px solid black;
-    }
-
     .title {
-      position: absolute;
+      position: fixed;
       top: 30px;
       left: 30px;
       font-size: 26px;
-      line-height: 1.2;
+      line-height: 1.4;
       z-index: 10;
+      cursor: pointer;
     }
 
     .title span {
-      border-bottom: 4px solid black;
+      display: inline-block;
+      position: relative;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    .title span::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 100%;
+      height: 2px;
+      background: black;
     }
 
     .mode {
-      position: absolute;
-      top: 45px;
-      right: 95px;
-      font-size: 26px;
-      z-index: 10;
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      font-size: 22px;
       text-decoration: none;
       color: black;
+      z-index: 10;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -370px;
+      width: 370px;
+      height: 100vh;
+      background: black;
+      color: white;
+      padding: 35px 30px;
+      box-sizing: border-box;
+      z-index: 50;
+      transition: left 0.3s;
+    }
+
+    .menu-title {
+      font-size: 26px;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+
+    .menu-title span {
+      display: inline-block;
+      position: relative;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    .menu-title span::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 100%;
+      height: 2px;
+      background: white;
+    }
+
+    .menu-item {
+      margin-top: 80px;
+      font-size: 18px;
+      color: white;
+      text-decoration: none;
+      display: block;
+    }
+
+    .window {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      border: 2px solid black;
+      position: relative;
+    }
+
+    .page {
+      position: absolute;
+      width: 12000px;
+      height: 9000px;
+      transform-origin: 0 0;
+      transition: transform 0.08s ease-out;
     }
 
     .bubble {
       position: absolute;
       background: #d3d3d3;
       border-radius: 50%;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .bubble:hover {
+      background: #eeeeee;
     }
 
     .photo {
@@ -63,122 +141,300 @@
       object-fit: cover;
     }
 
-    .info {
+    .curveText {
       position: absolute;
       width: 100%;
-      bottom: 14%;
-      text-align: center;
-      font-size: 15px;
-      transform: rotate(15deg);
+      height: 100%;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .curveText text {
+      fill: black;
+      font-family: Arial;
     }
   </style>
 </head>
 
-<body>
+<body onclick="closeMenu()">
 
-<div class="page" id="page">
-  <div class="title">
+<div class="title" onclick="toggleMenu(event)">
+  <span>PARSONS SURVIVAL</span><br>
+  <span>NETWORK</span>
+</div>
+
+<div class="sidebar" id="sidebar" onclick="event.stopPropagation()">
+  <div class="menu-title" onclick="toggleMenu(event)">
     <span>PARSONS SURVIVAL</span><br>
     <span>NETWORK</span>
   </div>
 
-  <a href="index.html" class="mode">requesting</a>
+  <a href="create.html" class="menu-item">create a post</a>
+</div>
+
+<a href="index.html" class="mode">requesting</a>
+
+<div class="window" id="window">
+  <div class="page" id="page"></div>
 </div>
 
 <script>
-const arenaData = "https://api.are.na/v3/channels/publication-btmpbivan1o/contents?per=20";
+function toggleMenu(event) {
+  event.stopPropagation();
 
-async function loadBubbles() {
-  const res = await fetch(arenaData);
-  const data = await res.json();
-  const items = data.data;
+  var sidebar = document.getElementById("sidebar");
 
-  const page = document.getElementById("page");
-  let placed = [];
-
-  let sizes = [
-    { w: 100, h: 70 },
-    { w: 190, h: 130 },
-    { w: 330, h: 220 }
-  ];
-
-  items.forEach((block, i) => {
-    let imageURL =
-      block.image?.display?.url ||
-      block.image?.original?.url ||
-      block.image?.thumb?.url ||
-      block.image?.src;
-
-    if (!imageURL) return;
-
-    let base = sizes[Math.floor(Math.random() * 3)];
-    let w = base.w;
-    let h = base.h;
-
-    let x, y, ok;
-    let tries = 0;
-
-    do {
-      ok = true;
-
-      x = 40 + Math.random() * (page.clientWidth - w - 80);
-      y = 120 + Math.random() * (page.clientHeight - h - 180);
-
-      if (i === 0) {
-        w = 330;
-        h = 220;
-        x = page.clientWidth / 2 - w / 2;
-        y = page.clientHeight / 2 - h / 2;
-      }
-
-      for (let j = 0; j < placed.length; j++) {
-        let b = placed[j];
-        let gap = 35;
-
-        let overlap =
-          x < b.x + b.w + gap &&
-          x + w + gap > b.x &&
-          y < b.y + b.h + gap &&
-          y + h + gap > b.y;
-
-        if (overlap) {
-          ok = false;
-          break;
-        }
-      }
-
-      tries++;
-      if (tries > 100) return;
-
-    } while (!ok);
-
-    let bubble = document.createElement("div");
-    bubble.className = "bubble";
-    bubble.style.width = w + "px";
-    bubble.style.height = h + "px";
-    bubble.style.left = x + "px";
-    bubble.style.top = y + "px";
-
-    let photo = document.createElement("div");
-    photo.className = "photo";
-
-    let img = document.createElement("img");
-    img.src = imageURL;
-
-    let info = document.createElement("div");
-    info.className = "info";
-    info.innerText = "title / urgency level";
-
-    photo.appendChild(img);
-    bubble.appendChild(photo);
-    bubble.appendChild(info);
-    page.appendChild(bubble);
-
-    placed.push({ x: x, y: y, w: w, h: h });
-  });
+  if (sidebar.style.left === "0px") {
+    sidebar.style.left = "-370px";
+  } else {
+    sidebar.style.left = "0px";
+  }
 }
 
-loadBubbles();
+function closeMenu() {
+  document.getElementById("sidebar").style.left = "-370px";
+}
+
+const arenaData = "https://api.are.na/v2/channels/parsons-survival-network-2/contents?per=50";
+
+let items = [];
+let placed = [];
+
+let sizes = [
+  { w: 160, h: 120 },
+  { w: 300, h: 220 },
+  { w: 480, h: 340 }
+];
+
+let moveX = -4500;
+let moveY = -3200;
+let scale = 1;
+
+const page = document.getElementById("page");
+const win = document.getElementById("window");
+
+function applyTransform() {
+  page.style.transform =
+    "translate(" + moveX + "px, " + moveY + "px) scale(" + scale + ")";
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(arenaData);
+    const data = await res.json();
+    items = data.contents;
+  } catch {
+    items = [];
+  }
+
+  for (let i = 0; i < 18; i++) {
+    makeBubble(0, 0);
+  }
+}
+
+function shortenText(text, maxLength) {
+  if (text.length > maxLength) {
+    return text.substring(0, maxLength) + "...";
+  }
+  return text;
+}
+
+function makeCurveText(bubble, w, h, block) {
+  let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.classList.add("curveText");
+  svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+
+  let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  let curveId = "curve" + placed.length + Math.floor(Math.random() * 10000);
+
+  path.setAttribute("id", curveId);
+  path.setAttribute("fill", "none");
+
+  if (w === 160) {
+    path.setAttribute("d", "M 18 88 C 55 115 105 115 142 88");
+  } else if (w === 300) {
+    path.setAttribute("d", "M 35 160 C 100 210 200 210 265 160");
+  } else {
+    path.setAttribute("d", "M 55 235 C 145 330 335 330 425 235");
+  }
+
+  let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+
+  let maxTitleLength;
+
+  if (w === 160) {
+    text.setAttribute("font-size", "14");
+    maxTitleLength = 14;
+  } else if (w === 300) {
+    text.setAttribute("font-size", "24");
+    maxTitleLength = 20;
+  } else {
+    text.setAttribute("font-size", "36");
+    maxTitleLength = 24;
+  }
+
+  let textPath = document.createElementNS("http://www.w3.org/2000/svg", "textPath");
+  textPath.setAttribute("href", "#" + curveId);
+  textPath.setAttribute("startOffset", "0%");
+  textPath.setAttribute("text-anchor", "start");
+
+  let parts = (block.title || "").split("/");
+
+  let titleText = parts[1]?.trim() || "help";
+
+  titleText = shortenText(titleText, maxTitleLength);
+
+  textPath.textContent = titleText;
+
+  text.appendChild(textPath);
+  svg.appendChild(path);
+  svg.appendChild(text);
+  bubble.appendChild(svg);
+}
+
+function makeBubble(directionX, directionY) {
+  if (items.length === 0) return;
+
+  let block = items[Math.floor(Math.random() * items.length)];
+
+  let imageURL =
+    block.image?.display?.url ||
+    block.image?.large?.url ||
+    block.image?.original?.url ||
+    block.image?.thumb?.url;
+
+  if (!imageURL) return;
+
+  let parts = (block.title || "").split("/");
+  let urgencyText = parts[0]?.trim().toUpperCase() || "LOW";
+
+  let size;
+
+  if (urgencyText === "LOW") {
+    size = sizes[0];
+  } else if (urgencyText === "URGENT") {
+    size = sizes[1];
+  } else if (urgencyText === "ASAP") {
+    size = sizes[2];
+  } else {
+    size = sizes[0];
+  }
+
+  let w = size.w;
+  let h = size.h;
+
+  let viewX = -moveX + window.innerWidth / 2;
+  let viewY = -moveY + window.innerHeight / 2;
+
+  let x, y, ok = false;
+
+  for (let tries = 0; tries < 300; tries++) {
+    if (directionX > 0) {
+      x = viewX + 700 + Math.random() * 1200;
+    } else if (directionX < 0) {
+      x = viewX - 1900 + Math.random() * 1200;
+    } else {
+      x = viewX - 900 + Math.random() * 1800;
+    }
+
+    if (directionY > 0) {
+      y = viewY + 500 + Math.random() * 1000;
+    } else if (directionY < 0) {
+      y = viewY - 1500 + Math.random() * 1000;
+    } else {
+      y = viewY - 700 + Math.random() * 1400;
+    }
+
+    ok = true;
+
+    for (let i = 0; i < placed.length; i++) {
+      let b = placed[i];
+      let gap = 50;
+
+      if (
+        x < b.x + b.w + gap &&
+        x + w + gap > b.x &&
+        y < b.y + b.h + gap &&
+        y + h + gap > b.y
+      ) {
+        ok = false;
+        break;
+      }
+    }
+
+    if (ok) break;
+  }
+
+  if (!ok) return;
+
+  let bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.style.width = w + "px";
+  bubble.style.height = h + "px";
+  bubble.style.left = x + "px";
+  bubble.style.top = y + "px";
+
+  bubble.onclick = function() {
+    localStorage.setItem("selectedPost", JSON.stringify(block));
+    location.href = "post2.html";
+  };
+
+  let photo = document.createElement("div");
+  photo.className = "photo";
+
+  let img = document.createElement("img");
+  img.src = imageURL;
+
+  photo.appendChild(img);
+  bubble.appendChild(photo);
+
+  makeCurveText(bubble, w, h, block);
+
+  page.appendChild(bubble);
+
+  placed.push({ x: x, y: y, w: w, h: h });
+}
+
+applyTransform();
+loadData();
+
+win.addEventListener("wheel", function(event) {
+  event.preventDefault();
+
+  if (event.ctrlKey) {
+    let oldScale = scale;
+
+    scale += event.deltaY * -0.005;
+
+    if (scale < 0.5) scale = 0.5;
+    if (scale > 2) scale = 2;
+
+    let mouseX = event.clientX;
+    let mouseY = event.clientY;
+
+    moveX = mouseX - (mouseX - moveX) * (scale / oldScale);
+    moveY = mouseY - (mouseY - moveY) * (scale / oldScale);
+  } else {
+    moveX -= event.deltaX;
+    moveY -= event.deltaY;
+
+    let directionX = 0;
+    let directionY = 0;
+
+    if (event.deltaX > 0) directionX = 1;
+    if (event.deltaX < 0) directionX = -1;
+    if (event.deltaY > 0) directionY = 1;
+    if (event.deltaY < 0) directionY = -1;
+
+    if (Math.random() < 0.3) {
+      makeBubble(directionX, directionY);
+    }
+  }
+
+  applyTransform();
+}, { passive: false });
 </script>
 
 </body>
