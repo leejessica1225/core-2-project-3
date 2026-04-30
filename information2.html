@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Information</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      background: white;
+      font-family: Arial;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .site-title {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      font-size: 26px;
+      line-height: 1.4;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .site-title span {
+      display: inline-block;
+      position: relative;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    .site-title span::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 100%;
+      height: 2px;
+      background: black;
+    }
+
+    .mode {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      font-size: 22px;
+      color: black;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -370px;
+      width: 370px;
+      height: 100vh;
+      background: black;
+      color: white;
+      padding: 35px 30px;
+      box-sizing: border-box;
+      transition: left 0.3s;
+      z-index: 50;
+    }
+
+    .menu-title {
+      font-size: 26px;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+
+    .menu-title span {
+      display: inline-block;
+      position: relative;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    .menu-title span::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 100%;
+      height: 2px;
+      background: white;
+    }
+
+    .menu-item {
+      margin-top: 60px;
+      font-size: 18px;
+      color: white;
+      text-decoration: none;
+      display: block;
+    }
+
+    .info-wrap {
+      position: relative;
+      width: 380px;
+      height: 520px;
+    }
+
+    .back-box {
+      position: absolute;
+      width: 380px;
+      height: 520px;
+      background: #9b9b9b;
+      left: 14px;
+      top: 14px;
+    }
+
+    .info-box {
+      position: absolute;
+      width: 380px;
+      height: 520px;
+      background: #d3d3d3;
+      padding: 25px 30px;
+      box-sizing: border-box;
+    }
+
+    .info-title {
+      font-size: 24px;
+      margin-bottom: 18px;
+    }
+
+    .line {
+      height: 1px;
+      background: black;
+      margin-bottom: 30px;
+    }
+
+    .field {
+      font-size: 14px;
+      margin-bottom: 26px;
+      display: flex;
+      align-items: center;
+    }
+
+    .field span {
+      margin-right: 6px;
+    }
+
+    input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 14px;
+      font-family: Arial;
+      width: 180px;
+      padding: 0;
+    }
+
+    .bottom-line {
+      position: absolute;
+      left: 30px;
+      right: 30px;
+      bottom: 70px;
+      height: 1px;
+      background: black;
+    }
+
+    .submit {
+      position: absolute;
+      left: 30px;
+      bottom: 25px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body onclick="closeMenu()">
+
+  <div class="site-title" onclick="toggleMenu(event)">
+    <span>PARSONS SURVIVAL</span><br>
+    <span>NETWORK</span>
+  </div>
+
+  <div class="mode">requesting</div>
+
+  <div class="sidebar" id="sidebar" onclick="event.stopPropagation()">
+    <div class="menu-title" onclick="toggleMenu(event)">
+      <span>PARSONS SURVIVAL</span><br>
+      <span>NETWORK</span>
+    </div>
+
+    <a href="create.html" class="menu-item">create a post</a>
+  </div>
+
+  <div class="info-wrap">
+    <div class="back-box"></div>
+
+    <div class="info-box">
+      <div class="info-title">Leave your information</div>
+      <div class="line"></div>
+
+      <div class="field">
+        <span>Name:</span>
+        <input id="name" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <span>Contact:</span>
+        <input id="contact" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <span>Current location:</span>
+        <input id="location" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <span>Available Time:</span>
+        <input id="time" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <span>Notes:</span>
+        <input id="notes" autocomplete="off">
+      </div>
+
+      <div class="bottom-line"></div>
+
+      <div class="submit" onclick="submitForm()">[Submit]</div>
+    </div>
+  </div>
+
+  <script>
+    function toggleMenu(event) {
+      event.stopPropagation();
+      let sidebar = document.getElementById("sidebar");
+
+      if (sidebar.style.left === "0px") {
+        sidebar.style.left = "-370px";
+      } else {
+        sidebar.style.left = "0px";
+      }
+    }
+
+    function closeMenu() {
+      document.getElementById("sidebar").style.left = "-370px";
+    }
+
+    function submitForm() {
+      let name = document.getElementById("name").value.trim();
+      let contact = document.getElementById("contact").value.trim();
+      let userLocation = document.getElementById("location").value.trim();
+      let time = document.getElementById("time").value.trim();
+      let notes = document.getElementById("notes").value.trim();
+
+      if (!name || !contact || !userLocation || !time || !notes) {
+        alert("Fill all fields");
+        return;
+      }
+
+      window.location.href = "confirmation2.html";
+    }
+  </script>
+
+</body>
+</html>
